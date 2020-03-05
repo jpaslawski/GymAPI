@@ -1,9 +1,11 @@
 package com.example.demo.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "Workout")
 @Table(name="workout")
 public class Workout {
 
@@ -21,6 +23,7 @@ public class Workout {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "workout_author")
+    @JsonIgnore
     private User author;
 
     @Column(name = "workout_isPublic")
@@ -75,5 +78,17 @@ public class Workout {
 
     public void setPublic(boolean aPublic) {
         isPublic = aPublic;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Workout )) return false;
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
     }
 }

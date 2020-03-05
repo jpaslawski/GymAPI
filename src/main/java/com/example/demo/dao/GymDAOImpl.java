@@ -90,15 +90,19 @@ public class GymDAOImpl implements GymDAO {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Workout> theQuery =
-                currentSession.createQuery("FROM Workout ORDER BY id", Workout.class);
+                currentSession.createQuery("FROM Workout", Workout.class);
 
         return theQuery.getResultList();
     }
 
     @Override
-    public void saveWorkout(Workout workout) {
+    public void saveWorkout(int userId, Workout workout) {
 
         Session currentSession = sessionFactory.getCurrentSession();
+
+        User user = getUser(userId);
+
+        user.addWorkout(workout);
 
         currentSession.saveOrUpdate(workout);
     }
@@ -107,7 +111,6 @@ public class GymDAOImpl implements GymDAO {
     public Workout getWorkout(int workoutId) {
 
         Workout workout = sessionFactory.getCurrentSession().find(Workout.class, workoutId);
-        Hibernate.initialize(workout.getAuthor());
         return workout;
     }
 

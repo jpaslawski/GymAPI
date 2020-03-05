@@ -53,8 +53,8 @@ public class GymServiceImpl implements GymService {
 
     @Override
     @Transactional
-    public void saveWorkout(Workout workout) {
-        gymDAO.saveWorkout(workout);
+    public void saveWorkout(int userId, Workout workout) {
+        gymDAO.saveWorkout(userId, workout);
     }
 
     @Override

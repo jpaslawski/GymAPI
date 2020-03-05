@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name = "User")
 @Table(name="user")
 public class User {
 
@@ -34,9 +34,10 @@ public class User {
     @Column(name = "user_permissions")
     private String permissions;
 
-    @OneToMany(mappedBy = "author",
-    cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.DETACH, CascadeType.REFRESH})
+    @OneToMany(fetch = FetchType.EAGER,
+            mappedBy = "author",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                    CascadeType.DETACH, CascadeType.REFRESH})
     private List<Workout> workouts;
 
     public User() {
@@ -130,13 +131,20 @@ public class User {
     }
 
     public void addWorkout(Workout workout) {
-
-        if(workouts == null) {
+        if (workouts == null) {
             workouts = new ArrayList<>();
         }
 
         workouts.add(workout);
-
         workout.setAuthor(this);
+    }
+
+    public void removeWorkout(Workout workout) {
+        if (workouts == null) {
+            workouts = new ArrayList<>();
+        }
+
+        workouts.remove(workout);
+        workout.setAuthor(null);
     }
 }

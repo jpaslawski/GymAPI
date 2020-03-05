@@ -1,5 +1,6 @@
 package com.example.demo.rest.workout;
 
+import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import com.example.demo.rest.ObjectNotFoundException;
 import com.example.demo.service.GymService;
@@ -42,8 +43,8 @@ public class WorkoutRestController {
         return workout;
     }
 
-    @PostMapping("/workouts")
-    public Workout addWorkout(@RequestBody Workout workout) {
+    @PostMapping("/workouts/{userId}")
+    public Workout addWorkout(@PathVariable int userId, @RequestBody Workout workout) {
 
         // Check if username, email and password is not empty
         if (workout.getName().isEmpty() || workout.getName() == null) {
@@ -54,12 +55,8 @@ public class WorkoutRestController {
             throw new ObjectNotFoundException("Email cannot be empty, you have to provide one!");
         }
 
-        if (workout.getAuthor() == null) {
-            throw new ObjectNotFoundException("You have to be logged in to add a workout!");
-        }
-
         workout.setId(0);
-        gymService.saveWorkout(workout);
+        gymService.saveWorkout(userId, workout);
 
         return workout;
     }
@@ -76,8 +73,8 @@ public class WorkoutRestController {
     }*/
 
     @PutMapping("/workouts")
-    public Workout updateWorkout(@RequestBody Workout workout) {
-        gymService.saveWorkout(workout);
+    public Workout updateWorkout(@RequestBody int userId, @RequestBody Workout workout) {
+        gymService.saveWorkout(userId, workout);
         return workout;
     }
 

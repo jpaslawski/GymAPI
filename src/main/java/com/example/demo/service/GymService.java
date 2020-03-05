@@ -19,7 +19,7 @@ public interface GymService {
 
     List<Workout> getWorkouts();
 
-    void saveWorkout(Workout workout);
+    void saveWorkout(int userId, Workout workout);
 
     Workout getWorkout(int workoutId);
 

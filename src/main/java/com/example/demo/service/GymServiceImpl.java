@@ -54,6 +54,12 @@ public class GymServiceImpl implements GymService {
 
     @Override
     @Transactional
+    public List<Workout> getWorkoutsByUserId(int userId) {
+        return gymDAO.getWorkoutsByUserId(userId);
+    }
+
+    @Override
+    @Transactional
     public void saveWorkout(int userId, Workout workout) {
         gymDAO.saveWorkout(userId, workout);
     }
@@ -80,6 +86,18 @@ public class GymServiceImpl implements GymService {
     @Transactional
     public void saveExercise(int userId, Exercise exercise) {
         gymDAO.saveExercise(userId, exercise);
+    }
+
+    @Override
+    @Transactional
+    public void addExerciseToWorkout(int exerciseId, int workoutId) {
+        gymDAO.addExerciseToWorkout(exerciseId, workoutId);
+    }
+
+    @Override
+    @Transactional
+    public void addNewExerciseToWorkout(int userId, int workoutId, Exercise exercise) {
+        gymDAO.addNewExerciseToWorkout(userId, workoutId, exercise);
     }
 
     @Override

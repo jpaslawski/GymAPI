@@ -25,6 +25,8 @@ public interface GymService {
 
     List<Workout> getWorkouts();
 
+    List<Workout> getWorkoutsByUserId(int userId);
+
     void saveWorkout(int userId, Workout workout);
 
     Workout getWorkout(int workoutId);
@@ -36,6 +38,10 @@ public interface GymService {
     List<Exercise> getExercises();
 
     void saveExercise(int userId, Exercise exercise);
+
+    void addExerciseToWorkout(int exerciseId, int workoutId);
+
+    void addNewExerciseToWorkout(int userId, int workoutId, Exercise exercise);
 
     Exercise getExercise(int exerciseId);
 

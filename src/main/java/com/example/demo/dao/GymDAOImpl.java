@@ -3,7 +3,6 @@ package com.example.demo.dao;
 import com.example.demo.entity.Exercise;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -11,7 +10,6 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.awt.*;
 import java.util.List;
 
 @Repository
@@ -20,6 +18,7 @@ public class GymDAOImpl implements GymDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
+    /** Get a list of all the users **/
     @Override
     public List<User> getUsers() {
 
@@ -31,6 +30,7 @@ public class GymDAOImpl implements GymDAO {
         return theQuery.getResultList();
     }
 
+    /** Save or update user account information - Sign Up **/
     @Override
     public void saveUser(User user) {
 
@@ -40,18 +40,18 @@ public class GymDAOImpl implements GymDAO {
 
     }
 
+    /** Get user account information **/
     @Override
     public User getUser(int id) {
 
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
-        // now retrieve/read from database using the primary key
         User user = currentSession.get(User.class, id);
 
         return user;
     }
 
+    /** Get user account information by providing his email **/
     @Override
     public User getUserByEmail(String userEmail) {
 
@@ -72,13 +72,12 @@ public class GymDAOImpl implements GymDAO {
         return user;
     }
 
+    /** Delete user account **/
     @Override
     public void deleteUser(int userId) {
 
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
-        // delete object with primary key
         Query theQuery =
                 currentSession.createQuery("DELETE FROM User WHERE id=:userId");
         theQuery.setParameter("userId", userId);
@@ -86,7 +85,7 @@ public class GymDAOImpl implements GymDAO {
         theQuery.executeUpdate();
     }
 
-
+    /** Get a list of all the workouts **/
     @Override
     public List<Workout> getWorkouts() {
         Session currentSession = sessionFactory.getCurrentSession();
@@ -97,6 +96,19 @@ public class GymDAOImpl implements GymDAO {
         return theQuery.getResultList();
     }
 
+    /** Get a list of all workouts of the given user **/
+    @Override
+    public List<Workout> getWorkoutsByUserId(int userId) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<Workout> theQuery =
+                currentSession.createQuery("FROM Workout WHERE author=:userId", Workout.class);
+        theQuery.setParameter("userId", userId);
+        return theQuery.getResultList();
+    }
+
+
+    /** Save or update a workout **/
     @Override
     public void saveWorkout(int userId, Workout workout) {
 
@@ -109,6 +121,7 @@ public class GymDAOImpl implements GymDAO {
         currentSession.saveOrUpdate(workout);
     }
 
+    /** Get a workout using its ID **/
     @Override
     public Workout getWorkout(int workoutId) {
 
@@ -116,13 +129,12 @@ public class GymDAOImpl implements GymDAO {
         return workout;
     }
 
+    /** Delete a workout by ID **/
     @Override
     public void deleteWorkout(int workoutId) {
 
-        // get the current hibernate session
         Session currentSession = sessionFactory.getCurrentSession();
 
-        // delete object with primary key
         Query theQuery =
                 currentSession.createQuery("DELETE FROM Workout WHERE id=:workoutId");
         theQuery.setParameter("workoutId", workoutId);
@@ -130,6 +142,9 @@ public class GymDAOImpl implements GymDAO {
         theQuery.executeUpdate();
     }
 
+
+
+    /** Get a list of all exercises **/
     @Override
     public List<Exercise> getExercises() {
         Session currentSession = sessionFactory.getCurrentSession();
@@ -140,6 +155,7 @@ public class GymDAOImpl implements GymDAO {
         return theQuery.getResultList();
     }
 
+    /** Save or update an exercise **/
     @Override
     public void saveExercise(int userId, Exercise exercise) {
         Session currentSession = sessionFactory.getCurrentSession();
@@ -147,24 +163,53 @@ public class GymDAOImpl implements GymDAO {
         User user = getUser(userId);
 
         exercise.setConnectedWorkout(null);
-
         user.addExercise(exercise);
 
         currentSession.saveOrUpdate(exercise);
     }
 
+    /** Add existing exercise to workout (user is already set) **/
+    @Override
+    public void addExerciseToWorkout(int exerciseId, int workoutId) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Workout workout = getWorkout(workoutId);
+        Exercise exercise = getExercise(exerciseId);
+
+        exercise.setConnectedWorkout(workout);
+        workout.addExercise(exercise);
+
+        currentSession.saveOrUpdate(exercise);
+    }
+
+    /** Create a new exercise and add it to a workout as one operation **/
+    @Override
+    public void addNewExerciseToWorkout(int userId, int workoutId, Exercise exercise) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        User user = getUser(userId);
+        Workout workout = getWorkout(workoutId);
+
+        exercise.setConnectedWorkout(workout);
+        user.addExercise(exercise);
+        workout.addExercise(exercise);
+
+        currentSession.saveOrUpdate(exercise);
+    }
+
+    /** Get an exercise using its ID **/
     @Override
     public Exercise getExercise(int exerciseId) {
         Exercise exercise = sessionFactory.getCurrentSession().find(Exercise.class, exerciseId);
         return exercise;
     }
 
+    /** Delete an exercise by ID **/
     @Override
     public void deleteExercise(int exerciseId) {
-        // get the current hibernate session
+
         Session currentSession = sessionFactory.getCurrentSession();
 
-        // delete object with primary key
         Query theQuery =
                 currentSession.createQuery("DELETE FROM Exercise WHERE id=:exerciseId");
         theQuery.setParameter("exerciseId", exerciseId);

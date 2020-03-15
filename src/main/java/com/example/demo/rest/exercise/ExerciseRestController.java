@@ -35,7 +35,6 @@ public class ExerciseRestController {
     @PostMapping("/exercises/{userId}")
     public Exercise addExercise(@PathVariable int userId, @RequestBody Exercise exercise) {
 
-        // Check if username, email and password is not empty
         if (exercise.getName().isEmpty() || exercise.getName() == null) {
             throw new ObjectNotFoundException("Exercise name cannot be empty, you have to provide one!");
         }
@@ -46,10 +45,30 @@ public class ExerciseRestController {
         return exercise;
     }
 
+    @PostMapping("/exercises/{userId}/{workoutId}")
+    public Exercise addNewExerciseToWorkout(@PathVariable int userId,@PathVariable int workoutId, @RequestBody Exercise exercise) {
+        // Check if username, email and password is not empty
+        if (exercise.getName().isEmpty() || exercise.getName() == null) {
+            throw new ObjectNotFoundException("Exercise name cannot be empty, you have to provide one!");
+        }
+
+        gymService.addNewExerciseToWorkout(userId, workoutId, exercise);
+
+        return exercise;
+    }
+
     @PutMapping("/exercises")
     public Exercise updateExercise(@RequestBody int userId, @RequestBody Exercise exercise) {
         gymService.saveExercise(userId, exercise);
         return exercise;
+    }
+
+    @PutMapping("/exercises/{exerciseId}/{workoutId}")
+    public String addExerciseToWorkout(@PathVariable int exerciseId,@PathVariable int workoutId) {
+
+        gymService.addExerciseToWorkout(exerciseId, workoutId);
+
+        return "Exercise " + exerciseId + " added to workout " + workoutId;
     }
 
     @DeleteMapping("/exercises/{exerciseId}")

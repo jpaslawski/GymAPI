@@ -20,16 +20,6 @@ public class WorkoutRestController {
 
         return gymService.getWorkouts();
     }
-/*
-    // path = "/users?email=...
-    @GetMapping(value = "/workouts", params = "email", produces="application/json")
-    public boolean checkIfUserExists(@RequestParam("email") String userEmail) {
-        User user = userService.getUserByEmail(userEmail);
-        if (user == null) {
-            return false;
-        }
-        return true;
-    }*/
 
     @GetMapping("/workouts/{workoutId}")
     public Workout getWorkout(@PathVariable int workoutId) {
@@ -40,6 +30,11 @@ public class WorkoutRestController {
             throw new ObjectNotFoundException("User id not found - " + workoutId);
         }
         return workout;
+    }
+
+    @GetMapping(value = "/workouts", params = "user", produces="application/json")
+    public List<Workout> getWorkoutsByUserId(@RequestParam("user") int userId) {
+        return gymService.getWorkoutsByUserId(userId);
     }
 
     @PostMapping("/workouts/{userId}")
@@ -55,17 +50,6 @@ public class WorkoutRestController {
 
         return workout;
     }
-/*
-    @PostMapping("/users/validate")
-    public boolean validateUser(@RequestBody JsonNode node) {
-        String login = node.get("login").asText();
-        String password = node.get("password").asText();
-        if (login != null && password != null) {
-            User user = userService.getUserByEmail(login);
-            return user.getPassword().equals(password);
-        }
-        return false;
-    }*/
 
     @PutMapping("/workouts")
     public Workout updateWorkout(@RequestBody int userId, @RequestBody Workout workout) {

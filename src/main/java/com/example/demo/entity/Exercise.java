@@ -20,7 +20,7 @@ public class Exercise {
     private String info;
 
     @Column(name = "exercise_isPublic")
-    private Boolean isPublic;
+    private boolean isPublic;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
@@ -38,7 +38,7 @@ public class Exercise {
 
     }
 
-    public Exercise(String name, String info, Boolean isPublic, Workout connectedWorkout, User author) {
+    public Exercise(String name, String info, boolean isPublic, Workout connectedWorkout, User author) {
         this.name = name;
         this.info = info;
         this.isPublic = isPublic;
@@ -70,11 +70,11 @@ public class Exercise {
         this.info = info;
     }
 
-    public Boolean getPublic() {
+    public boolean isPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean aPublic) {
+    public void setPublic(boolean aPublic) {
         isPublic = aPublic;
     }
 

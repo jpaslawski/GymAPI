@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.GymDAO;
+import com.example.demo.entity.Exercise;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,5 +68,29 @@ public class GymServiceImpl implements GymService {
     @Transactional
     public void deleteWorkout(int workoutId) {
         gymDAO.deleteWorkout(workoutId);
+    }
+
+    @Override
+    @Transactional
+    public List<Exercise> getExercises() {
+        return gymDAO.getExercises();
+    }
+
+    @Override
+    @Transactional
+    public void saveExercise(int userId, Exercise exercise) {
+        gymDAO.saveExercise(userId, exercise);
+    }
+
+    @Override
+    @Transactional
+    public Exercise getExercise(int exerciseId) {
+        return gymDAO.getExercise(exerciseId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteExercise(int exerciseId) {
+        gymDAO.deleteExercise(exerciseId);
     }
 }

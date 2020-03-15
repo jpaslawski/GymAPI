@@ -24,15 +24,15 @@ public class UserRestController {
 
     // path = "/users?email=...
     @GetMapping(value = "/users", params = "email", produces="application/json")
-    public boolean checkIfUserExists(@RequestParam("email") String userEmail) {
+    public User getUserByEmail(@RequestParam("email") String userEmail) {
 
         User user = gymService.getUserByEmail(userEmail);
 
         if (user == null) {
-            return false;
+            return null;
         }
 
-        return true;
+        return user;
     }
 
     @GetMapping("/users/{userId}")
@@ -63,9 +63,9 @@ public class UserRestController {
         }
 
         // Check if email already in database
-        boolean exists = checkIfUserExists(user.getEmail());
+        User tempUser = getUserByEmail(user.getEmail());
 
-        if (exists) {
+        if (tempUser == null) {
             throw new ObjectNotFoundException("An account with this email already exists!");
         }
 
@@ -97,7 +97,7 @@ public class UserRestController {
     }
 
     @DeleteMapping("/users/{userId}")
-    public String deleteUser(@PathVariable int userId) {
+    public Boolean deleteUser(@PathVariable int userId) {
 
         User tempUser = gymService.getUser(userId);
 
@@ -107,6 +107,6 @@ public class UserRestController {
 
         gymService.deleteUser(userId);
 
-        return "Deleted user id - " + userId;
+        return true;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.dao;
 
+import com.example.demo.entity.Exercise;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import org.hibernate.Hibernate;
@@ -10,6 +11,7 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.awt.*;
 import java.util.List;
 
 @Repository
@@ -124,6 +126,48 @@ public class GymDAOImpl implements GymDAO {
         Query theQuery =
                 currentSession.createQuery("DELETE FROM Workout WHERE id=:workoutId");
         theQuery.setParameter("workoutId", workoutId);
+
+        theQuery.executeUpdate();
+    }
+
+    @Override
+    public List<Exercise> getExercises() {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<Exercise> theQuery =
+                currentSession.createQuery("FROM Exercise", Exercise.class);
+
+        return theQuery.getResultList();
+    }
+
+    @Override
+    public void saveExercise(int userId, Exercise exercise) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        User user = getUser(userId);
+
+        exercise.setConnectedWorkout(null);
+
+        user.addExercise(exercise);
+
+        currentSession.saveOrUpdate(exercise);
+    }
+
+    @Override
+    public Exercise getExercise(int exerciseId) {
+        Exercise exercise = sessionFactory.getCurrentSession().find(Exercise.class, exerciseId);
+        return exercise;
+    }
+
+    @Override
+    public void deleteExercise(int exerciseId) {
+        // get the current hibernate session
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        // delete object with primary key
+        Query theQuery =
+                currentSession.createQuery("DELETE FROM Exercise WHERE id=:exerciseId");
+        theQuery.setParameter("exerciseId", exerciseId);
 
         theQuery.executeUpdate();
     }

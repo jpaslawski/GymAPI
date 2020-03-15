@@ -1,5 +1,8 @@
 package com.example.demo.entity;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +42,13 @@ public class User {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH})
     private List<Workout> workouts;
+
+    @OneToMany(fetch = FetchType.EAGER,
+            mappedBy = "author",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                    CascadeType.DETACH, CascadeType.REFRESH})
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<Exercise> exercises;
 
     public User() {
 
@@ -130,6 +140,14 @@ public class User {
         this.workouts = workouts;
     }
 
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
+    }
+
     public void addWorkout(Workout workout) {
         if (workouts == null) {
             workouts = new ArrayList<>();
@@ -146,5 +164,23 @@ public class User {
 
         workouts.remove(workout);
         workout.setAuthor(null);
+    }
+
+    public void addExercise(Exercise exercise) {
+        if (exercises == null) {
+            exercises = new ArrayList<>();
+        }
+
+        exercises.add(exercise);
+        exercise.setAuthor(this);
+    }
+
+    public void removeExercise(Exercise exercise) {
+        if (exercises == null) {
+            exercises = new ArrayList<>();
+        }
+
+        exercises.remove(exercise);
+        exercise.setAuthor(null);
     }
 }

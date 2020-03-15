@@ -1,11 +1,14 @@
 package com.example.demo.service;
 
+import com.example.demo.entity.Exercise;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 
 import java.util.List;
 
 public interface GymService {
+
+    /********************* User methods *********************/
 
     List<User> getUsers();
 
@@ -17,13 +20,24 @@ public interface GymService {
 
     void deleteUser(int userId);
 
+
+    /********************* Workout methods *********************/
+
     List<Workout> getWorkouts();
 
     void saveWorkout(int userId, Workout workout);
 
     Workout getWorkout(int workoutId);
 
-    //User getUserByEmail(String userEmail);
-
     void deleteWorkout(int workoutId);
+
+    /********************* Exercise methods *********************/
+
+    List<Exercise> getExercises();
+
+    void saveExercise(int userId, Exercise exercise);
+
+    Exercise getExercise(int exerciseId);
+
+    void deleteExercise(int exerciseId);
 }

@@ -4,6 +4,8 @@ package com.example.demo.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "Workout")
 @Table(name="workout")
@@ -20,14 +22,20 @@ public class Workout {
     @Column(name = "workout_info")
     private String info;
 
+    @Column(name = "workout_isPublic")
+    private boolean isPublic;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "workout_author")
     @JsonIgnore
     private User author;
 
-    @Column(name = "workout_isPublic")
-    private boolean isPublic;
+    @OneToMany(fetch = FetchType.EAGER,
+            mappedBy = "connectedWorkout",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                    CascadeType.DETACH, CascadeType.REFRESH})
+    private List<Exercise> exercises;
 
     public Workout() {
 
@@ -80,6 +88,14 @@ public class Workout {
         isPublic = aPublic;
     }
 
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -90,5 +106,23 @@ public class Workout {
     @Override
     public int hashCode() {
         return 31;
+    }
+
+    public void addExercise(Exercise exercise) {
+        if (exercises == null) {
+            exercises = new ArrayList<>();
+        }
+
+        exercises.add(exercise);
+        exercise.setConnectedWorkout(this);
+    }
+
+    public void removeExercise(Exercise exercise) {
+        if (exercises == null) {
+            exercises = new ArrayList<>();
+        }
+
+        exercises.remove(exercise);
+        exercise.setConnectedWorkout(null);
     }
 }

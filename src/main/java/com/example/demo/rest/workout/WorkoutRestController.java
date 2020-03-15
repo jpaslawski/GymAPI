@@ -1,6 +1,5 @@
 package com.example.demo.rest.workout;
 
-import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import com.example.demo.rest.ObjectNotFoundException;
 import com.example.demo.service.GymService;
@@ -48,11 +47,7 @@ public class WorkoutRestController {
 
         // Check if username, email and password is not empty
         if (workout.getName().isEmpty() || workout.getName() == null) {
-            throw new ObjectNotFoundException("Username cannot be empty, you have to provide one!");
-        }
-
-        if (workout.getInfo().isEmpty() || workout.getInfo() == null) {
-            throw new ObjectNotFoundException("Email cannot be empty, you have to provide one!");
+            throw new ObjectNotFoundException("Workout name cannot be empty, you have to provide one!");
         }
 
         workout.setId(0);

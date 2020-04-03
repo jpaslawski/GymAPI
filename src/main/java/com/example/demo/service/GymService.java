@@ -37,6 +37,8 @@ public interface GymService {
 
     List<Exercise> getExercises();
 
+    List<Exercise> getExercisesByWorkoutId(int workoutId);
+
     void saveExercise(int userId, Exercise exercise);
 
     void addExerciseToWorkout(int exerciseId, int workoutId);

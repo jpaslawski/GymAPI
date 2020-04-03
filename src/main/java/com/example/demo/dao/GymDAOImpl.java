@@ -67,9 +67,7 @@ public class GymDAOImpl implements GymDAO {
             return null;
         }
 
-        User user = (User) list.get(0);
-
-        return user;
+        return (User) list.get(0);
     }
 
     /** Delete user account **/
@@ -151,6 +149,20 @@ public class GymDAOImpl implements GymDAO {
 
         Query<Exercise> theQuery =
                 currentSession.createQuery("FROM Exercise", Exercise.class);
+
+        return theQuery.getResultList();
+    }
+
+    /** Get a list of all exercises connected with the given workout **/
+    @Override
+    public List<Exercise> getExercisesByWorkoutId(int workoutId) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Workout workout = getWorkout(workoutId);
+
+        Query<Exercise> theQuery =
+                currentSession.createQuery("FROM Exercise WHERE connectedWorkout=:workout", Exercise.class);
+        theQuery.setParameter("workout", workout);
 
         return theQuery.getResultList();
     }

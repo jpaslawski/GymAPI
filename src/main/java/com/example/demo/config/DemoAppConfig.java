@@ -13,21 +13,56 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.util.Properties;
+import javax.servlet.Filter;
 import java.util.logging.Logger;
 
 @Configuration
 @EnableTransactionManagement
 @ComponentScan("com.example.demo")
-@PropertySource({ "classpath:persistence-mysql.properties" })
-public class DemoAppConfig implements WebMvcConfigurer {
+@PropertySource({"classpath:persistence-mysql.properties"})
+public class DemoAppConfig implements WebMvcConfigurer, Filter {
 
     @Autowired
     private Environment env;
 
     private Logger logger = Logger.getLogger(getClass().getName());
+
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+
+        HttpServletResponse response = (HttpServletResponse) res;
+
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
+
+        response.setHeader("Access-Control-Allow-Headers", "Authorization," +
+                " Origin, " +
+                " Access-Control-Allow-Methods," +
+                " Access-Control-Allow-Origin, " +
+                " Access-Control-Allow-Credentials");
+        if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) req).getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            chain.doFilter(req, res);
+        }
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) {
+    }
+
+    @Override
+    public void destroy() {
+    }
+
 
     @Bean
     public DataSource myDataSource() {
@@ -74,7 +109,7 @@ public class DemoAppConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public LocalSessionFactoryBean sessionFactory(){
+    public LocalSessionFactoryBean sessionFactory() {
 
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 

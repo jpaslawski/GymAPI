@@ -84,6 +84,12 @@ public class GymServiceImpl implements GymService {
 
     @Override
     @Transactional
+    public List<Exercise> getExercisesByWorkoutId(int workoutId) {
+        return gymDAO.getExercisesByWorkoutId(workoutId);
+    }
+
+    @Override
+    @Transactional
     public void saveExercise(int userId, Exercise exercise) {
         gymDAO.saveExercise(userId, exercise);
     }

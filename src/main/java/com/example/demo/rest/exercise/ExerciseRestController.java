@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class ExerciseRestController {
 
     @Autowired
@@ -21,8 +22,13 @@ public class ExerciseRestController {
         return gymService.getExercises();
     }
 
+    @GetMapping(value = "/exercises", params = "workout", produces="application/json")
+    public List<Exercise> getExercisesByWorkoutId(@RequestParam("workout") int workout) {
+        return gymService.getExercisesByWorkoutId(workout);
+    }
+
     @GetMapping("/exercises/{exerciseId}")
-    public Exercise getWorkout(@PathVariable int exerciseId) {
+    public Exercise getExercise(@PathVariable int exerciseId) {
 
         Exercise exercise = gymService.getExercise(exerciseId);
 

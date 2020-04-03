@@ -38,12 +38,10 @@ public class Exercise {
 
     }
 
-    public Exercise(String name, String info, boolean isPublic, Workout connectedWorkout, User author) {
+    public Exercise(String name, String info, boolean isPublic) {
         this.name = name;
         this.info = info;
         this.isPublic = isPublic;
-        this.connectedWorkout = connectedWorkout;
-        this.author = author;
     }
 
     public int getId() {

@@ -2,7 +2,6 @@ package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,14 +32,8 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-/*
         http.authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic();
-*/
-        http.authorizeRequests()
-                .antMatchers("/api/customers/**").authenticated()
+                .antMatchers("/api/users/**").authenticated()
                 .and()
                 .httpBasic()
                 .and()

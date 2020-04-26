@@ -1,12 +1,16 @@
 package com.example.demo.dao;
 
 import com.example.demo.entity.Exercise;
+import com.example.demo.entity.ExerciseCategory;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 
 import java.util.List;
+import java.util.Set;
 
 public interface GymDAO {
+
+    String getEmailFromToken(String header);
 
     /********************* User methods *********************/
 
@@ -26,7 +30,7 @@ public interface GymDAO {
 
     List<Workout> getWorkoutsByUserId(int userId);
 
-    void saveWorkout(int userId, Workout workout);
+    void saveWorkout(String email, Workout workout);
 
     Workout getWorkout(int workoutId);
 
@@ -36,9 +40,9 @@ public interface GymDAO {
 
     List<Exercise> getExercises();
 
-    List<Exercise> getExercisesByWorkoutId(int workoutId);
+    Set<Exercise> getExercisesByWorkoutId(int workoutId);
 
-    void saveExercise(int userId, Exercise exercise);
+    void saveExercise(String email, Exercise exercise, String category);
 
     void addExerciseToWorkout(int exerciseId, int workoutId);
 
@@ -47,4 +51,12 @@ public interface GymDAO {
     Exercise getExercise(int exerciseId);
 
     void deleteExercise(int exerciseId);
+
+    void deleteExerciseFromWorkout(int exerciseId, int workoutId);
+
+    /********************* Exercise Categories methods *********************/
+
+    List<ExerciseCategory> getCategories();
+
+    void addExerciseCategory(ExerciseCategory exerciseCategory);
 }

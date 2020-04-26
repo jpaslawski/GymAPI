@@ -1,9 +1,13 @@
 package com.example.demo.rest.user;
 
+import com.example.demo.entity.request.AuthenticationRequest;
+import com.example.demo.entity.request.AuthenticationResponse;
 import com.example.demo.entity.User;
+import com.example.demo.entity.request.UserData;
 import com.example.demo.rest.ObjectNotFoundException;
 import com.example.demo.service.GymService;
-import com.fasterxml.jackson.databind.JsonNode;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,17 +15,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin
 public class UserRestController {
 
     @Autowired
     private GymService gymService;
 
     @GetMapping("/users")
+    @CrossOrigin
     public ResponseEntity<List<User>> getUsers() {
 
         List<User> userList = gymService.getUsers();
@@ -57,28 +63,30 @@ public class UserRestController {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
+    @PostMapping("/create")
+    public ResponseEntity<User> addUser(@RequestBody UserData newAccount) {
 
         // Check if username, email and password is not empty
-        if (user.getUsername().isEmpty() || user.getUsername() == null) {
+        if (newAccount.getUsername().isEmpty() || newAccount.getUsername() == null) {
             throw new ObjectNotFoundException("Username cannot be empty, you have to provide one!");
         }
 
-        if (user.getEmail().isEmpty() || user.getEmail() == null) {
+        if (newAccount.getEmail().isEmpty() || newAccount.getEmail() == null) {
             throw new ObjectNotFoundException("Email cannot be empty, you have to provide one!");
         }
 
-        if (user.getPassword().isEmpty() || user.getPassword() == null) {
+        if (newAccount.getPassword().isEmpty() || newAccount.getPassword() == null) {
             throw new ObjectNotFoundException("Password cannot be empty, you have to provide one!");
         }
 
         // Check if email already in database
-        User tempUser = gymService.getUserByEmail(user.getEmail());
+        User tempUser = gymService.getUserByEmail(newAccount.getEmail());
 
         if (tempUser != null) {
             throw new ObjectNotFoundException("An account with this email already exists!");
         }
+
+        User user = new User(newAccount.getUsername(), newAccount.getEmail(), newAccount.getPassword(), 0.0f, 0.0f, 0, "ROLE_USER");
 
         user.setId(0);
         gymService.saveUser(user);
@@ -91,22 +99,31 @@ public class UserRestController {
         return ResponseEntity.created(uri).body(user);
     }
 
-    @PostMapping("/users/validate")
-    public ResponseEntity<String> validateUser(@RequestBody JsonNode node) {
+    @PostMapping("/authenticate")
+    public ResponseEntity<?> validateUser(@RequestBody AuthenticationRequest authenticationRequest) {
 
-        String login = node.get("login").asText();
+        if(authenticationRequest.getEmail() != null && authenticationRequest.getPassword() != null) {
+            User user = gymService.getUserByEmail(authenticationRequest.getEmail());
 
-        String password = node.get("password").asText();
+            if(user.getPassword().equals(authenticationRequest.getPassword())) {
 
-        if (login != null && password != null) {
-            User user = gymService.getUserByEmail(login);
+                AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+                String token = Jwts.builder()
+                        .setSubject(authenticationRequest.getEmail())
+                        .claim("email", user.getEmail())
+                        .claim("permissions", user.getPermissions())
+                        .setIssuedAt(new Date(System.currentTimeMillis()))
+                        .setExpiration(new Date(System.currentTimeMillis() + 1000*60*60*10))
+                        .signWith(SignatureAlgorithm.HS256, "iFuZc|_6D{UBn(A".getBytes(StandardCharsets.UTF_8))
+                        .compact();
 
-            if(user.getPassword().equals(password)) {
-                return new ResponseEntity<String>("Authorized", HttpStatus.ACCEPTED);
+                authenticationResponse.setToken(token);
+
+                return new ResponseEntity<>(authenticationResponse, HttpStatus.ACCEPTED);
             }
         }
 
-        return new ResponseEntity<String>("Unauthorized", HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>("Unauthorized", HttpStatus.FORBIDDEN);
     }
 
     @PutMapping("/users")

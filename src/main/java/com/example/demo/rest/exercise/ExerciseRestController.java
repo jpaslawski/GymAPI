@@ -1,12 +1,16 @@
 package com.example.demo.rest.exercise;
 
 import com.example.demo.entity.Exercise;
+import com.example.demo.entity.ExerciseCategory;
+import com.example.demo.entity.request.ExerciseData;
 import com.example.demo.rest.ObjectNotFoundException;
 import com.example.demo.service.GymService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -22,9 +26,17 @@ public class ExerciseRestController {
         return gymService.getExercises();
     }
 
-    @GetMapping(value = "/exercises", params = "workout", produces="application/json")
-    public List<Exercise> getExercisesByWorkoutId(@RequestParam("workout") int workout) {
-        return gymService.getExercisesByWorkoutId(workout);
+    @GetMapping(value = "/exercises", params = "workoutId", produces="application/json")
+    public ResponseEntity<Set<Exercise>> getExercisesByWorkoutId(@RequestParam("workoutId") int workoutId) {
+
+        Set<Exercise> exercises = gymService.getExercisesByWorkoutId(workoutId);
+
+        Set<ExerciseData> exerciseData;
+
+        if (exercises.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(exercises);
     }
 
     @GetMapping("/exercises/{exerciseId}")
@@ -38,15 +50,19 @@ public class ExerciseRestController {
         return exercise;
     }
 
-    @PostMapping("/exercises/{userId}")
-    public Exercise addExercise(@PathVariable int userId, @RequestBody Exercise exercise) {
+    @PostMapping("/exercises")
+    public Exercise addExercise(@RequestHeader (name="Authorization") String header, @RequestBody ExerciseData exerciseData) {
 
-        if (exercise.getName().isEmpty() || exercise.getName() == null) {
+        if (exerciseData.getName().isEmpty() || exerciseData.getName() == null) {
             throw new ObjectNotFoundException("Exercise name cannot be empty, you have to provide one!");
         }
 
+        String email = gymService.getEmailFromToken(header);
+
+        Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), false);
         exercise.setId(0);
-        gymService.saveExercise(userId, exercise);
+
+        gymService.saveExercise(email, exercise, exerciseData.getCategory());
 
         return exercise;
     }
@@ -64,8 +80,11 @@ public class ExerciseRestController {
     }
 
     @PutMapping("/exercises")
-    public Exercise updateExercise(@RequestBody int userId, @RequestBody Exercise exercise) {
-        gymService.saveExercise(userId, exercise);
+    public Exercise updateExercise(@RequestHeader (name="Authorization") String header, @RequestBody ExerciseData exerciseData) {
+        String email = gymService.getEmailFromToken(header);
+
+        Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), false);
+        gymService.saveExercise(email, exercise, exerciseData.getCategory());
         return exercise;
     }
 
@@ -87,6 +106,19 @@ public class ExerciseRestController {
         }
 
         gymService.deleteExercise(exerciseId);
+
+        return "Deleted exercise id - " + exerciseId;
+    }
+
+    @DeleteMapping("/exercises/{exerciseId}/{workoutId}")
+    public String deleteExerciseFromWorkout(@PathVariable int exerciseId, @PathVariable int workoutId) {
+        Exercise tempExercise = gymService.getExercise(exerciseId);
+
+        if (tempExercise == null) {
+            throw new ObjectNotFoundException("Exercise id not found - " + exerciseId);
+        }
+
+        gymService.deleteExerciseFromWorkout(exerciseId, workoutId);
 
         return "Deleted exercise id - " + exerciseId;
     }

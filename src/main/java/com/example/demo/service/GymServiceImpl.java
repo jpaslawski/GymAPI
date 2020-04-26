@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dao.GymDAO;
 import com.example.demo.entity.Exercise;
+import com.example.demo.entity.ExerciseCategory;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class GymServiceImpl implements GymService {
 
     @Autowired
     private GymDAO gymDAO;
+
+    @Override
+    public String getEmailFromToken(String header) {
+        return gymDAO.getEmailFromToken(header);
+    }
 
     @Override
     @Transactional
@@ -60,8 +67,8 @@ public class GymServiceImpl implements GymService {
 
     @Override
     @Transactional
-    public void saveWorkout(int userId, Workout workout) {
-        gymDAO.saveWorkout(userId, workout);
+    public void saveWorkout(String email, Workout workout) {
+        gymDAO.saveWorkout(email, workout);
     }
 
     @Override
@@ -84,14 +91,14 @@ public class GymServiceImpl implements GymService {
 
     @Override
     @Transactional
-    public List<Exercise> getExercisesByWorkoutId(int workoutId) {
+    public Set<Exercise> getExercisesByWorkoutId(int workoutId) {
         return gymDAO.getExercisesByWorkoutId(workoutId);
     }
 
     @Override
     @Transactional
-    public void saveExercise(int userId, Exercise exercise) {
-        gymDAO.saveExercise(userId, exercise);
+    public void saveExercise(String email, Exercise exercise, String category) {
+        gymDAO.saveExercise(email, exercise, category);
     }
 
     @Override
@@ -102,8 +109,14 @@ public class GymServiceImpl implements GymService {
 
     @Override
     @Transactional
-    public void addNewExerciseToWorkout(int userId, int workoutId, Exercise exercise) {
-        gymDAO.addNewExerciseToWorkout(userId, workoutId, exercise);
+    public void addExerciseCategory(ExerciseCategory exerciseCategory) {
+        gymDAO.addExerciseCategory(exerciseCategory);
+    }
+
+    @Override
+    @Transactional
+    public void deleteExerciseFromWorkout(int exerciseId, int workoutId) {
+        gymDAO.deleteExerciseFromWorkout(exerciseId, workoutId);
     }
 
     @Override
@@ -116,5 +129,17 @@ public class GymServiceImpl implements GymService {
     @Transactional
     public void deleteExercise(int exerciseId) {
         gymDAO.deleteExercise(exerciseId);
+    }
+
+    @Override
+    @Transactional
+    public List<ExerciseCategory> getCategories() {
+        return gymDAO.getCategories();
+    }
+
+    @Override
+    @Transactional
+    public void addNewExerciseToWorkout(int userId, int workoutId, Exercise exercise) {
+        gymDAO.addNewExerciseToWorkout(userId, workoutId, exercise);
     }
 }

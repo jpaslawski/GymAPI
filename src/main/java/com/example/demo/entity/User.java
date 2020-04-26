@@ -52,7 +52,6 @@ public class User {
     private List<Exercise> exercises;
 
     public User() {
-
     }
 
     public User(String username, String email, String password, Float weight, Float height, Integer age, String permissions) {

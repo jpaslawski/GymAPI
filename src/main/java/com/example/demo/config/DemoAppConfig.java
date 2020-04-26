@@ -11,6 +11,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.*;
@@ -39,20 +40,16 @@ public class DemoAppConfig implements WebMvcConfigurer, Filter {
 
         HttpServletResponse response = (HttpServletResponse) res;
 
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:8000");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
-
-        response.setHeader("Access-Control-Allow-Headers", "Authorization," +
-                " Origin, " +
-                " Access-Control-Allow-Methods," +
-                " Access-Control-Allow-Origin, " +
-                " Access-Control-Allow-Credentials");
+        response.setHeader("Content-Type", "application/json; charset=utf-8");
+        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Access-Control-Allow-Origin");
         if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) req).getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            chain.doFilter(req, res);
         }
+
+        chain.doFilter(req, res);
     }
 
     @Override
@@ -87,6 +84,18 @@ public class DemoAppConfig implements WebMvcConfigurer, Filter {
         myDataSource.setMaxIdleTime(getIntProperty("connection.pool.maxIdleTime"));
 
         return myDataSource;
+    }
+
+
+    @Bean
+    public CommonsRequestLoggingFilter logFilter() {
+        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+        filter.setIncludeQueryString(true);
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(10000);
+        filter.setIncludeHeaders(false);
+        filter.setAfterMessagePrefix("REQUEST DATA : ");
+        return filter;
     }
 
     private Properties getHibernateProperties() {

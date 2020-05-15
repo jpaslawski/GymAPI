@@ -42,11 +42,13 @@ public interface GymDAO {
 
     Set<Exercise> getExercisesByWorkoutId(int workoutId);
 
+    Set<Exercise> getExercisesByCategory(String category);
+
     void saveExercise(String email, Exercise exercise, String category);
 
     void addExerciseToWorkout(int exerciseId, int workoutId);
 
-    void addNewExerciseToWorkout(int userId, int workoutId, Exercise exercise);
+    void addNewExerciseToWorkout(String email, int workoutId, Exercise exercise, String category);
 
     Exercise getExercise(int exerciseId);
 
@@ -55,6 +57,8 @@ public interface GymDAO {
     void deleteExerciseFromWorkout(int exerciseId, int workoutId);
 
     /********************* Exercise Categories methods *********************/
+
+    ExerciseCategory getCategoryByName(String category);
 
     List<ExerciseCategory> getCategories();
 

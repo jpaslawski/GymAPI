@@ -21,13 +21,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class UserRestController {
 
     @Autowired
     private GymService gymService;
 
     @GetMapping("/users")
-    @CrossOrigin
     public ResponseEntity<List<User>> getUsers() {
 
         List<User> userList = gymService.getUsers();

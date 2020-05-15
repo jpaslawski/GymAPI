@@ -22,9 +22,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-
         if (!request.getRequestURI().contains("/authenticate") && !request.getRequestURI().contains("/create")) {
             final String header = request.getHeader("Authorization");
+            System.out.println(header);
             UsernamePasswordAuthenticationToken authResult = getAuthenticationByToken(header);
             if (authResult == null) {
                 throw new ServletException("This request is not authorized!");

@@ -1,11 +1,11 @@
 package com.example.demo.rest.exercise;
 
 import com.example.demo.entity.Exercise;
-import com.example.demo.entity.ExerciseCategory;
 import com.example.demo.entity.request.ExerciseData;
 import com.example.demo.rest.ObjectNotFoundException;
 import com.example.demo.service.GymService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +26,23 @@ public class ExerciseRestController {
         return gymService.getExercises();
     }
 
-    @GetMapping(value = "/exercises", params = "workoutId", produces="application/json")
+    @GetMapping(value = "/exercises", params = "workoutId", produces = "application/json")
     public ResponseEntity<Set<Exercise>> getExercisesByWorkoutId(@RequestParam("workoutId") int workoutId) {
 
         Set<Exercise> exercises = gymService.getExercisesByWorkoutId(workoutId);
 
-        Set<ExerciseData> exerciseData;
-
         if (exercises.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(exercises);
+    }
+
+    @GetMapping(value="/exercises", params = "category", produces = "application/json")
+    public ResponseEntity<Set<Exercise>> getExercisesByCategory(@RequestParam("category") String category) {
+
+        Set<Exercise> exercises = gymService.getExercisesByCategory(category);
+
+        if(exercises.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exercises);
@@ -67,16 +76,21 @@ public class ExerciseRestController {
         return exercise;
     }
 
-    @PostMapping("/exercises/{userId}/{workoutId}")
-    public Exercise addNewExerciseToWorkout(@PathVariable int userId,@PathVariable int workoutId, @RequestBody Exercise exercise) {
-        // Check if username, email and password is not empty
-        if (exercise.getName().isEmpty() || exercise.getName() == null) {
-            throw new ObjectNotFoundException("Exercise name cannot be empty, you have to provide one!");
+    @PostMapping("/exercises/{workoutId}")
+    public ResponseEntity<?> addNewExerciseToWorkout(@RequestHeader (name="Authorization") String header, @PathVariable("workoutId") int workoutId, @RequestBody ExerciseData exerciseData) {
+
+        if (exerciseData.getName().isEmpty() || exerciseData.getName() == null) {
+            return new ResponseEntity<>("The name field is empty!", HttpStatus.BAD_REQUEST);
+        } else if (exerciseData.getCategory() == null) {
+            return new ResponseEntity<>("The category field is empty!", HttpStatus.BAD_REQUEST);
         }
 
-        gymService.addNewExerciseToWorkout(userId, workoutId, exercise);
+        String email = gymService.getEmailFromToken(header);
 
-        return exercise;
+        Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), false);
+        gymService.addNewExerciseToWorkout(email, workoutId, exercise, exerciseData.getCategory());
+
+        return ResponseEntity.ok(gymService.getExercisesByWorkoutId(workoutId));
     }
 
     @PutMapping("/exercises")

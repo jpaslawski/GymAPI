@@ -19,7 +19,7 @@ public class ExerciseCategory {
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER,
-            mappedBy = "category",
+            mappedBy = "exerciseCategory",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH})
     private Set<Exercise> connectedExercises;

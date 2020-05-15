@@ -27,7 +27,7 @@ public class Exercise {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "category")
-    private ExerciseCategory category;
+    private ExerciseCategory exerciseCategory;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "exercises")
@@ -81,12 +81,12 @@ public class Exercise {
         isPublic = aPublic;
     }
 
-    public ExerciseCategory getCategory() {
-        return category;
+    public ExerciseCategory getExerciseCategory() {
+        return exerciseCategory;
     }
 
-    public void setCategory(ExerciseCategory category) {
-        this.category = category;
+    public void setExerciseCategory(ExerciseCategory category) {
+        this.exerciseCategory = category;
     }
 
     public User getAuthor() {

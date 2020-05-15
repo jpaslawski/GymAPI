@@ -97,6 +97,12 @@ public class GymServiceImpl implements GymService {
 
     @Override
     @Transactional
+    public Set<Exercise> getExercisesByCategory(String category) {
+        return gymDAO.getExercisesByCategory(category);
+    }
+
+    @Override
+    @Transactional
     public void saveExercise(String email, Exercise exercise, String category) {
         gymDAO.saveExercise(email, exercise, category);
     }
@@ -133,13 +139,19 @@ public class GymServiceImpl implements GymService {
 
     @Override
     @Transactional
+    public ExerciseCategory getCategoryByName(String category) {
+        return gymDAO.getCategoryByName(category);
+    }
+
+    @Override
+    @Transactional
     public List<ExerciseCategory> getCategories() {
         return gymDAO.getCategories();
     }
 
     @Override
     @Transactional
-    public void addNewExerciseToWorkout(int userId, int workoutId, Exercise exercise) {
-        gymDAO.addNewExerciseToWorkout(userId, workoutId, exercise);
+    public void addNewExerciseToWorkout(String email, int workoutId, Exercise exercise, String category) {
+        gymDAO.addNewExerciseToWorkout(email, workoutId, exercise, category);
     }
 }

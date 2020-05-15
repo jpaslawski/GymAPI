@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -157,8 +158,6 @@ public class GymDAOImpl implements GymDAO {
         currentSession.remove(workout);
     }
 
-
-
     /** Get a list of all exercises **/
     @Override
     public List<Exercise> getExercises() {
@@ -180,6 +179,22 @@ public class GymDAOImpl implements GymDAO {
         return workout.getExercises();
     }
 
+    /** Get a list of all exercises of the given category **/
+    @Override
+    public Set<Exercise> getExercisesByCategory(String category) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        ExerciseCategory exerciseCategory = getCategoryByName(category);
+        if (exerciseCategory == null) {
+            return null;
+        }
+
+        Query<Exercise> theQuery =
+                currentSession.createQuery("FROM Exercise WHERE exerciseCategory=:category", Exercise.class);
+        theQuery.setParameter("category", exerciseCategory);
+
+        return new HashSet<>(theQuery.getResultList());
+    }
+
     /** Save or update an exercise **/
     @Override
     public void saveExercise(String email, Exercise exercise, String category) {
@@ -192,7 +207,7 @@ public class GymDAOImpl implements GymDAO {
         theQuery.setParameter("category", category);
 
         ExerciseCategory exerciseCategory = theQuery.getSingleResult();
-        exercise.setCategory(exerciseCategory);
+        exercise.setExerciseCategory(exerciseCategory);
 
         user.addExercise(exercise);
 
@@ -214,16 +229,26 @@ public class GymDAOImpl implements GymDAO {
 
     /** Create a new exercise and add it to a workout as one operation **/
     @Override
-    public void addNewExerciseToWorkout(int userId, int workoutId, Exercise exercise) {
+    public void addNewExerciseToWorkout(String email, int workoutId, Exercise exercise, String category) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        User user = getUser(userId);
+        User user = getUserByEmail(email);
         Workout workout = getWorkout(workoutId);
+
+        Query<ExerciseCategory> theQuery =
+                currentSession.createQuery("FROM ExerciseCategory WHERE category=:category", ExerciseCategory.class);
+        theQuery.setParameter("category", category);
+
+        ExerciseCategory exerciseCategory = theQuery.getSingleResult();
+        exercise.setExerciseCategory(exerciseCategory);
 
         user.addExercise(exercise);
         workout.addExercise(exercise);
 
         currentSession.saveOrUpdate(exercise);
+
+        workout.setExerciseAmount(workout.getExerciseAmount() + 1);
+        currentSession.saveOrUpdate(workout);
     }
 
     /** Get an exercise using its ID **/
@@ -246,6 +271,7 @@ public class GymDAOImpl implements GymDAO {
         theQuery.executeUpdate();
     }
 
+    /** Delete an exercise from the given workout **/
     @Override
     public void deleteExerciseFromWorkout(int exerciseId, int workoutId) {
         Session currentSession = sessionFactory.getCurrentSession();
@@ -253,8 +279,22 @@ public class GymDAOImpl implements GymDAO {
         Exercise exercise = currentSession.find(Exercise.class, exerciseId);
 
         workout.removeExercise(exercise);
+
+        workout.setExerciseAmount(workout.getExerciseAmount() - 1);
     }
 
+    /** Get the category of the given name **/
+    @Override
+    public ExerciseCategory getCategoryByName(String category) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        Query<ExerciseCategory> theQuery =
+                currentSession.createQuery("FROM ExerciseCategory WHERE category LIKE :category", ExerciseCategory.class);
+        theQuery.setParameter("category", "%" + category + "%");
+
+        return theQuery.getSingleResult();
+    }
+
+    /** Get a list of all exercise categories **/
     @Override
     public List<ExerciseCategory> getCategories() {
         Session currentSession = sessionFactory.getCurrentSession();

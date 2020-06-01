@@ -1,41 +1,14 @@
-package com.example.demo.service;
+package com.example.demo.service.exercise;
 
 import com.example.demo.entity.Exercise;
 import com.example.demo.entity.ExerciseCategory;
+import com.example.demo.entity.ExerciseLog;
 import com.example.demo.entity.User;
-import com.example.demo.entity.Workout;
 
 import java.util.List;
 import java.util.Set;
 
-public interface GymService {
-
-    String getEmailFromToken(String header);
-
-    /********************* User methods *********************/
-
-    List<User> getUsers();
-
-    void saveUser(User user);
-
-    User getUser(int userId);
-
-    User getUserByEmail(String userEmail);
-
-    void deleteUser(int userId);
-
-
-    /********************* Workout methods *********************/
-
-    List<Workout> getWorkouts();
-
-    List<Workout> getWorkoutsByUserId(int userId);
-
-    void saveWorkout(String email, Workout workout);
-
-    Workout getWorkout(int workoutId);
-
-    void deleteWorkout(int workoutId);
+public interface ExerciseService {
 
     /********************* Exercise methods *********************/
 
@@ -45,11 +18,11 @@ public interface GymService {
 
     Set<Exercise> getExercisesByCategory(String category);
 
-    void saveExercise(String email, Exercise exercise, String category);
+    void saveExercise(User user, Exercise exercise, String category);
 
     void addExerciseToWorkout(int exerciseId, int workoutId);
 
-    void addNewExerciseToWorkout(String email, int workoutId, Exercise exercise, String category);
+    void addNewExerciseToWorkout(User user, int workoutId, Exercise exercise, String category);
 
     Exercise getExercise(int exerciseId);
 
@@ -65,4 +38,8 @@ public interface GymService {
     void addExerciseCategory(ExerciseCategory exerciseCategory);
 
     void deleteExerciseFromWorkout(int exerciseId, int workoutId);
+
+    /********************* Exercise Logs methods *********************/
+
+    List<ExerciseLog> getExerciseLogs(int exerciseId);
 }

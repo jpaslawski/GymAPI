@@ -51,6 +51,13 @@ public class User {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Exercise> exercises;
 
+    @OneToMany(fetch = FetchType.EAGER,
+            mappedBy = "trainee",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                    CascadeType.DETACH, CascadeType.REFRESH})
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<ExerciseLog> exerciseLogs;
+
     public User() {
     }
 
@@ -148,6 +155,14 @@ public class User {
         this.exercises = exercises;
     }
 
+    public List<ExerciseLog> getExerciseLogs() {
+        return exerciseLogs;
+    }
+
+    public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
+        this.exerciseLogs = exerciseLogs;
+    }
+
     public void addWorkout(Workout workout) {
         if (workouts == null) {
             workouts = new ArrayList<>();
@@ -182,5 +197,23 @@ public class User {
 
         exercises.remove(exercise);
         exercise.setAuthor(null);
+    }
+
+    public void addExerciseLog(ExerciseLog exerciseLog) {
+        if (exerciseLogs == null) {
+            exerciseLogs = new ArrayList<>();
+        }
+
+        exerciseLogs.add(exerciseLog);
+        exerciseLog.setTrainee(this);
+    }
+
+    public void removeExerciseLog(ExerciseLog exerciseLog) {
+        if (exerciseLogs == null) {
+            exerciseLogs = new ArrayList<>();
+        }
+
+        exerciseLogs.remove(exerciseLog);
+        exerciseLog.setTrainee(null);
     }
 }

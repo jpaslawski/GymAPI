@@ -1,9 +1,11 @@
 package com.example.demo.rest.workout;
 
+import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import com.example.demo.entity.request.WorkoutData;
 import com.example.demo.rest.ObjectNotFoundException;
-import com.example.demo.service.GymService;
+import com.example.demo.service.user.UserService;
+import com.example.demo.service.workout.WorkoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +18,15 @@ import java.util.List;
 public class WorkoutRestController {
 
     @Autowired
-    private GymService gymService;
+    private WorkoutService workoutService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/workouts")
     public ResponseEntity<List<Workout>> getWorkouts() {
 
-        List<Workout> workoutList = gymService.getWorkouts();
+        List<Workout> workoutList = workoutService.getWorkouts();
 
         if(workoutList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -33,7 +38,7 @@ public class WorkoutRestController {
     @GetMapping("/workouts/{workoutId}")
     public ResponseEntity<Workout> getWorkout(@PathVariable int workoutId) {
 
-        Workout workout = gymService.getWorkout(workoutId);
+        Workout workout = workoutService.getWorkout(workoutId);
 
         if (workout == null) {
             throw new ObjectNotFoundException("User id not found - " + workoutId);
@@ -43,7 +48,7 @@ public class WorkoutRestController {
 
     @GetMapping(value = "/workouts", params = "user", produces="application/json")
     public ResponseEntity<List<Workout>> getWorkoutsByUserId(@RequestParam("user") int userId) {
-        List<Workout> userWorkoutList = gymService.getWorkoutsByUserId(userId);
+        List<Workout> userWorkoutList = workoutService.getWorkoutsByUserId(userId);
 
         if(userWorkoutList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -60,34 +65,34 @@ public class WorkoutRestController {
             throw new ObjectNotFoundException("Workout name cannot be empty, you have to provide one!");
         }
 
-        String email = gymService.getEmailFromToken(header);
+        User user = userService.getUserFromToken(header);
 
         Workout workout = new Workout(workoutData.getName(), workoutData.getInfo(), null, false, 0);
 
         workout.setId(0);
-        gymService.saveWorkout(email, workout);
+        workoutService.saveWorkout(user, workout);
 
         return workout;
     }
 
     @PutMapping("/workouts")
     public Workout updateWorkout(@RequestHeader (name="Authorization") String header, @RequestBody Workout workout) {
-        String email = gymService.getEmailFromToken(header);
+        User user = userService.getUserFromToken(header);
 
-        gymService.saveWorkout(email, workout);
+        workoutService.saveWorkout(user, workout);
         return workout;
     }
 
     @DeleteMapping("/workouts/{workoutId}")
     public String deleteWorkout(@PathVariable int workoutId) {
 
-        Workout tempWorkout = gymService.getWorkout(workoutId);
+        Workout tempWorkout = workoutService.getWorkout(workoutId);
 
         if (tempWorkout == null) {
             throw new ObjectNotFoundException("Workout id not found - " + workoutId);
         }
 
-        gymService.deleteWorkout(workoutId);
+        workoutService.deleteWorkout(workoutId);
 
         return "Deleted workout id - " + workoutId;
     }

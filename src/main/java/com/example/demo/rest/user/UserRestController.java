@@ -5,7 +5,7 @@ import com.example.demo.entity.request.AuthenticationResponse;
 import com.example.demo.entity.User;
 import com.example.demo.entity.request.UserData;
 import com.example.demo.rest.ObjectNotFoundException;
-import com.example.demo.service.GymService;
+import com.example.demo.service.user.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +25,12 @@ import java.util.List;
 public class UserRestController {
 
     @Autowired
-    private GymService gymService;
+    private UserService userService;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers() {
 
-        List<User> userList = gymService.getUsers();
+        List<User> userList = userService.getUsers();
 
         if(userList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -43,7 +43,7 @@ public class UserRestController {
     @GetMapping(value = "/users", params = "email", produces="application/json")
     public ResponseEntity<User> getUserByEmail(@RequestParam("email") String userEmail) {
 
-        User user = gymService.getUserByEmail(userEmail);
+        User user = userService.getUserByEmail(userEmail);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -55,7 +55,7 @@ public class UserRestController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<User> getUser(@PathVariable int userId) {
 
-        User user = gymService.getUser(userId);
+        User user = userService.getUser(userId);
 
         if (user == null) {
             throw new ObjectNotFoundException("User id not found - " + userId);
@@ -80,7 +80,7 @@ public class UserRestController {
         }
 
         // Check if email already in database
-        User tempUser = gymService.getUserByEmail(newAccount.getEmail());
+        User tempUser = userService.getUserByEmail(newAccount.getEmail());
 
         if (tempUser != null) {
             throw new ObjectNotFoundException("An account with this email already exists!");
@@ -89,7 +89,7 @@ public class UserRestController {
         User user = new User(newAccount.getUsername(), newAccount.getEmail(), newAccount.getPassword(), 0.0f, 0.0f, 0, "ROLE_USER");
 
         user.setId(0);
-        gymService.saveUser(user);
+        userService.saveUser(user);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -103,7 +103,7 @@ public class UserRestController {
     public ResponseEntity<?> validateUser(@RequestBody AuthenticationRequest authenticationRequest) {
 
         if(authenticationRequest.getEmail() != null && authenticationRequest.getPassword() != null) {
-            User user = gymService.getUserByEmail(authenticationRequest.getEmail());
+            User user = userService.getUserByEmail(authenticationRequest.getEmail());
 
             if(user.getPassword().equals(authenticationRequest.getPassword())) {
 
@@ -128,7 +128,7 @@ public class UserRestController {
 
     @PutMapping("/users")
     public ResponseEntity<User> updateUser(@RequestBody User user) {
-        gymService.saveUser(user);
+        userService.saveUser(user);
 
         return ResponseEntity.ok(user);
     }
@@ -136,13 +136,13 @@ public class UserRestController {
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable int userId) {
 
-        User tempUser = gymService.getUser(userId);
+        User tempUser = userService.getUser(userId);
 
         if (tempUser == null) {
             throw new ObjectNotFoundException("User id not found - " + userId);
         }
 
-        gymService.deleteUser(userId);
+        userService.deleteUser(userId);
 
         return ResponseEntity.noContent().build();
     }

@@ -1,162 +1,23 @@
-package com.example.demo.dao;
+package com.example.demo.dao.exercise;
 
-import com.example.demo.entity.Exercise;
-import com.example.demo.entity.ExerciseCategory;
-import com.example.demo.entity.User;
-import com.example.demo.entity.Workout;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
+import com.example.demo.dao.user.UserDAOImpl;
+import com.example.demo.dao.workout.WorkoutDAOImpl;
+import com.example.demo.entity.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Repository
-public class GymDAOImpl implements GymDAO {
+public class ExerciseDAOImpl implements ExerciseDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
-
-    @Override
-    public String getEmailFromToken(String header) {
-
-        // Parse token trough signing key
-        Jws<Claims> claimsJws = Jwts.parser().setSigningKey("iFuZc|_6D{UBn(A".getBytes(StandardCharsets.UTF_8))
-                .parseClaimsJws(header.replace("Bearer ", ""));
-
-        return claimsJws.getBody().get("email").toString();
-    }
-
-    /** Get a list of all the users **/
-    @Override
-    public List<User> getUsers() {
-
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        Query<User> theQuery =
-                currentSession.createQuery("FROM User ORDER BY id", User.class);
-
-        return theQuery.getResultList();
-    }
-
-    /** Save or update user account information - Sign Up **/
-    @Override
-    public void saveUser(User user) {
-
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        currentSession.saveOrUpdate(user);
-
-    }
-
-    /** Get user account information **/
-    @Override
-    public User getUser(int id) {
-
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        User user = currentSession.get(User.class, id);
-
-        return user;
-    }
-
-    /** Get user account information by providing his email **/
-    @Override
-    public User getUserByEmail(String userEmail) {
-
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        Query query =
-                currentSession.createQuery("FROM User WHERE email= :userEmail");
-        query.setParameter("userEmail", userEmail);
-
-        List list = query.list();
-
-        if (list.isEmpty()) {
-            return null;
-        }
-
-        return (User) list.get(0);
-    }
-
-    /** Delete user account **/
-    @Override
-    public void deleteUser(int userId) {
-
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        Query theQuery =
-                currentSession.createQuery("DELETE FROM User WHERE id=:userId");
-        theQuery.setParameter("userId", userId);
-
-        theQuery.executeUpdate();
-    }
-
-    /** Get a list of all the workouts **/
-    @Override
-    public List<Workout> getWorkouts() {
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        Query<Workout> theQuery =
-                currentSession.createQuery("FROM Workout", Workout.class);
-
-        return theQuery.getResultList();
-    }
-
-    /** Get a list of all workouts of the given user **/
-    @Override
-    public List<Workout> getWorkoutsByUserId(int userId) {
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        Query<Workout> theQuery =
-                currentSession.createQuery("FROM Workout WHERE author=:userId", Workout.class);
-        theQuery.setParameter("userId", userId);
-        return theQuery.getResultList();
-    }
-
-
-    /** Save or update a workout **/
-    @Override
-    public void saveWorkout(String email, Workout workout) {
-
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        User user = getUserByEmail(email);
-        workout.setAuthor(user);
-        user.addWorkout(workout);
-
-        currentSession.saveOrUpdate(workout);
-    }
-
-    /** Get a workout using its ID **/
-    @Override
-    public Workout getWorkout(int workoutId) {
-
-        Workout workout = sessionFactory.getCurrentSession().find(Workout.class, workoutId);
-        return workout;
-    }
-
-    /** Delete a workout by ID **/
-    @Override
-    public void deleteWorkout(int workoutId) {
-
-        Session currentSession = sessionFactory.getCurrentSession();
-        Workout workout = currentSession.find(Workout.class, workoutId);
-
-        for (Exercise exercise : workout.getExercises()) {
-            workout.removeExercise(exercise);
-        }
-
-        currentSession.remove(workout);
-    }
 
     /** Get a list of all exercises **/
     @Override
@@ -197,10 +58,8 @@ public class GymDAOImpl implements GymDAO {
 
     /** Save or update an exercise **/
     @Override
-    public void saveExercise(String email, Exercise exercise, String category) {
+    public void saveExercise(User user, Exercise exercise, String category) {
         Session currentSession = sessionFactory.getCurrentSession();
-
-        User user = getUserByEmail(email);
 
         Query<ExerciseCategory> theQuery =
                 currentSession.createQuery("FROM ExerciseCategory WHERE category=:category", ExerciseCategory.class);
@@ -219,7 +78,7 @@ public class GymDAOImpl implements GymDAO {
     public void addExerciseToWorkout(int exerciseId, int workoutId) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        Workout workout = getWorkout(workoutId);
+        Workout workout = new WorkoutDAOImpl().getWorkout(workoutId);
         Exercise exercise = getExercise(exerciseId);
         workout.addExercise(exercise);
         workout.setExerciseAmount(workout.getExerciseAmount() + 1);
@@ -229,11 +88,10 @@ public class GymDAOImpl implements GymDAO {
 
     /** Create a new exercise and add it to a workout as one operation **/
     @Override
-    public void addNewExerciseToWorkout(String email, int workoutId, Exercise exercise, String category) {
+    public void addNewExerciseToWorkout(User user, int workoutId, Exercise exercise, String category) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        User user = getUserByEmail(email);
-        Workout workout = getWorkout(workoutId);
+        Workout workout = new WorkoutDAOImpl().getWorkout(workoutId);
 
         Query<ExerciseCategory> theQuery =
                 currentSession.createQuery("FROM ExerciseCategory WHERE category=:category", ExerciseCategory.class);
@@ -312,4 +170,14 @@ public class GymDAOImpl implements GymDAO {
         currentSession.saveOrUpdate(exerciseCategory);
     }
 
+    @Override
+    public List<ExerciseLog> getExerciseLogs(int exerciseId) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<ExerciseLog> theQuery =
+                currentSession.createQuery("FROM ExerciseLog WHERE referredExercise=:exerciseId", ExerciseLog.class);
+        theQuery.setParameter("exerciseId", exerciseId);
+
+        return theQuery.getResultList();
+    }
 }

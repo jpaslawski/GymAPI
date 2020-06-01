@@ -1,9 +1,13 @@
 package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity(name = "Exercise")
@@ -38,6 +42,13 @@ public class Exercise {
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "author")
     private User author;
+
+    @OneToMany(fetch = FetchType.EAGER,
+            mappedBy = "referredExercise",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                    CascadeType.DETACH, CascadeType.REFRESH})
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<ExerciseLog> exerciseLogs;
 
     public Exercise() {
 
@@ -115,5 +126,23 @@ public class Exercise {
 
     public void setWorkouts(Set<Workout> workouts) {
         this.workouts = workouts;
+    }
+
+    public void addExerciseLog(ExerciseLog exerciseLog) {
+        if (exerciseLogs == null) {
+            exerciseLogs = new ArrayList<>();
+        }
+
+        exerciseLogs.add(exerciseLog);
+        exerciseLog.setReferredExercise(this);
+    }
+
+    public void removeExerciseLog(ExerciseLog exerciseLog) {
+        if (exerciseLogs == null) {
+            exerciseLogs = new ArrayList<>();
+        }
+
+        exerciseLogs.remove(exerciseLog);
+        exerciseLog.setReferredExercise(null);
     }
 }

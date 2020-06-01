@@ -2,7 +2,7 @@ package com.example.demo.rest.exercise;
 
 import com.example.demo.entity.ExerciseCategory;
 import com.example.demo.rest.ObjectNotFoundException;
-import com.example.demo.service.GymService;
+import com.example.demo.service.exercise.ExerciseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +16,11 @@ import java.util.List;
 public class CategoryRestController {
 
     @Autowired
-    private GymService gymService;
+    private ExerciseService exerciseService;
 
     @GetMapping("/categories")
     public ResponseEntity<List<ExerciseCategory>> getCategories() {
-        List<ExerciseCategory> categoryList = gymService.getCategories();
+        List<ExerciseCategory> categoryList = exerciseService.getCategories();
 
         if(categoryList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -35,7 +35,7 @@ public class CategoryRestController {
             throw new ObjectNotFoundException("No category identifier provided!");
         }
 
-        gymService.addExerciseCategory(exerciseCategory);
+        exerciseService.addExerciseCategory(exerciseCategory);
 
         return new ResponseEntity<>("Category " + exerciseCategory.getCategory() + " saved successfully!", HttpStatus.ACCEPTED);
     }

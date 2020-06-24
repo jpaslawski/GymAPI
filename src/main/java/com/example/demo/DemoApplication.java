@@ -11,12 +11,21 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 
 @SpringBootApplication(exclude = HibernateJpaAutoConfiguration.class)
 public class DemoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
+	}
+
+	@PostConstruct
+	void started() {
+		// set JVM timezone as UTC
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 
 	// Enable HTTPS connection

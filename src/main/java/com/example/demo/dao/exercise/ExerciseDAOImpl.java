@@ -1,8 +1,8 @@
 package com.example.demo.dao.exercise;
 
-import com.example.demo.dao.user.UserDAOImpl;
 import com.example.demo.dao.workout.WorkoutDAOImpl;
 import com.example.demo.entity.*;
+import com.example.demo.entity.request.ExerciseLogData;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -171,13 +171,25 @@ public class ExerciseDAOImpl implements ExerciseDAO {
     }
 
     @Override
-    public List<ExerciseLog> getExerciseLogs(int exerciseId) {
+    public List<ExerciseLog> getExerciseLogs(Exercise exercise, User user) {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<ExerciseLog> theQuery =
-                currentSession.createQuery("FROM ExerciseLog WHERE referredExercise=:exerciseId", ExerciseLog.class);
-        theQuery.setParameter("exerciseId", exerciseId);
-
+                currentSession.createQuery("FROM ExerciseLog WHERE trainee=:user AND referredExercise=:exercise ORDER BY submitDate DESC", ExerciseLog.class);
+        theQuery.setParameter("user", user);
+        theQuery.setParameter("exercise", exercise);
         return theQuery.getResultList();
+    }
+
+    @Override
+    public void addExerciseLog(User user, ExerciseLog exerciseLog) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Exercise exercise = exerciseLog.getReferredExercise();
+
+        exercise.addExerciseLog(exerciseLog);
+        user.addExerciseLog(exerciseLog);
+
+        currentSession.saveOrUpdate(exerciseLog);
     }
 }

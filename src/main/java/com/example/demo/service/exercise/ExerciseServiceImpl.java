@@ -5,6 +5,7 @@ import com.example.demo.entity.Exercise;
 import com.example.demo.entity.ExerciseCategory;
 import com.example.demo.entity.ExerciseLog;
 import com.example.demo.entity.User;
+import com.example.demo.entity.request.ExerciseLogData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,8 +62,15 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    public List<ExerciseLog> getExerciseLogs(int exerciseId) {
-        return exerciseDAO.getExerciseLogs(exerciseId);
+    @Transactional
+    public List<ExerciseLog> getExerciseLogs(Exercise exercise, User user) {
+        return exerciseDAO.getExerciseLogs(exercise, user);
+    }
+
+    @Override
+    @Transactional
+    public void addExerciseLog(User user, ExerciseLog exerciseLog) {
+        exerciseDAO.addExerciseLog(user, exerciseLog);
     }
 
     @Override

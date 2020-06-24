@@ -1,4 +1,4 @@
-package com.example.demo.entity.request;
+package com.example.demo.entity.response;
 
 
 public class AuthenticationResponse {

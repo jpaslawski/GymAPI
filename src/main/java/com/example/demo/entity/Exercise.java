@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.stereotype.Indexed;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Entity(name = "Exercise")
 @Table(name = "exercise")
+@Indexed
 public class Exercise {
 
     @Id
@@ -108,6 +110,22 @@ public class Exercise {
         this.author = author;
     }
 
+    public Set<Workout> getWorkouts() {
+        return workouts;
+    }
+
+    public void setWorkouts(Set<Workout> workouts) {
+        this.workouts = workouts;
+    }
+
+    public List<ExerciseLog> getExerciseLogs() {
+        return exerciseLogs;
+    }
+
+    public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
+        this.exerciseLogs = exerciseLogs;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -118,14 +136,6 @@ public class Exercise {
     @Override
     public int hashCode() {
         return 31;
-    }
-
-    public Set<Workout> getWorkouts() {
-        return workouts;
-    }
-
-    public void setWorkouts(Set<Workout> workouts) {
-        this.workouts = workouts;
     }
 
     public void addExerciseLog(ExerciseLog exerciseLog) {

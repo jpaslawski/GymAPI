@@ -1,9 +1,10 @@
 package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity(name = "ExerciseLog")
 @Table(name = "exercise_log")
@@ -15,7 +16,7 @@ public class ExerciseLog {
     private int id;
 
     @Column(name = "exercise_log_date")
-    private Date submitDate;
+    private LocalDate submitDate;
 
     @JsonIgnore
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
@@ -35,6 +36,15 @@ public class ExerciseLog {
     @JoinColumn(name = "exercise_log_reference")
     private Exercise referredExercise;
 
+    public ExerciseLog() {
+
+    }
+
+    public ExerciseLog(float weight, int reps) {
+        this.weight = weight;
+        this.reps = reps;
+    }
+
 
     public int getId() {
         return id;
@@ -44,11 +54,11 @@ public class ExerciseLog {
         this.id = id;
     }
 
-    public Date getSubmitDate() {
+    public LocalDate getSubmitDate() {
         return submitDate;
     }
 
-    public void setSubmitDate(Date submitDate) {
+    public void setSubmitDate(LocalDate submitDate) {
         this.submitDate = submitDate;
     }
 
@@ -82,5 +92,17 @@ public class ExerciseLog {
 
     public void setReferredExercise(Exercise referredExercise) {
         this.referredExercise = referredExercise;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ExerciseLog )) return false;
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
     }
 }

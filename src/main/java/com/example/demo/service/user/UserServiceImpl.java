@@ -15,6 +15,7 @@ public class UserServiceImpl implements UserService {
     private UserDAO userDAO;
 
     @Override
+    @Transactional
     public User getUserFromToken(String header) {
         return userDAO.getUserFromToken(header);
     }

@@ -4,6 +4,7 @@ import com.example.demo.entity.Exercise;
 import com.example.demo.entity.ExerciseCategory;
 import com.example.demo.entity.ExerciseLog;
 import com.example.demo.entity.User;
+import com.example.demo.entity.request.ExerciseLogData;
 
 import java.util.List;
 import java.util.Set;
@@ -40,5 +41,7 @@ public interface ExerciseDAO {
 
     /********************* Exercise Logs methods *********************/
 
-    List<ExerciseLog> getExerciseLogs(int exerciseId);
+    List<ExerciseLog> getExerciseLogs(Exercise exercise, User user);
+
+    void addExerciseLog(User user, ExerciseLog exerciseLog);
 }

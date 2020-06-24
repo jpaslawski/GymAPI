@@ -1,7 +1,7 @@
 package com.example.demo.rest.user;
 
 import com.example.demo.entity.request.AuthenticationRequest;
-import com.example.demo.entity.request.AuthenticationResponse;
+import com.example.demo.entity.response.AuthenticationResponse;
 import com.example.demo.entity.User;
 import com.example.demo.entity.request.UserData;
 import com.example.demo.rest.ObjectNotFoundException;

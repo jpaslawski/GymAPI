@@ -1,9 +1,6 @@
 package com.example.demo.dao.exercise;
 
-import com.example.demo.entity.Exercise;
-import com.example.demo.entity.ExerciseCategory;
-import com.example.demo.entity.ExerciseLog;
-import com.example.demo.entity.User;
+import com.example.demo.entity.*;
 import com.example.demo.entity.request.ExerciseLogData;
 
 import java.util.List;
@@ -21,9 +18,9 @@ public interface ExerciseDAO {
 
     void saveExercise(User user, Exercise exercise, String category);
 
-    void addExerciseToWorkout(int exerciseId, int workoutId);
+    void addExerciseToWorkout(Exercise exercise, Workout workout);
 
-    void addNewExerciseToWorkout(User user, int workoutId, Exercise exercise, String category);
+    void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);
 
     Exercise getExercise(int exerciseId);
 

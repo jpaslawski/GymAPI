@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -75,12 +76,18 @@ public class WorkoutRestController {
         return workout;
     }
 
-    @PutMapping("/workouts")
-    public Workout updateWorkout(@RequestHeader (name="Authorization") String header, @RequestBody Workout workout) {
+    @PutMapping("/workouts/{workoutId}")
+    public ResponseEntity<Workout> updateWorkout(@RequestHeader (name="Authorization") String header, @RequestBody Workout workout, @PathVariable int workoutId) {
         User user = userService.getUserFromToken(header);
 
+        Optional<Workout> optionalWorkout = Optional.ofNullable(workoutService.getWorkout(workoutId));
+        if(workoutService.getWorkout(workoutId) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        workout.setId(workoutId);
         workoutService.saveWorkout(user, workout);
-        return workout;
+
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/workouts/{workoutId}")

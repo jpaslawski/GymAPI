@@ -36,7 +36,7 @@ public class Exercise {
     private ExerciseCategory exerciseCategory;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "exercises")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "exercises")
     private Set<Workout> workouts = new HashSet<>();
 
     @JsonIgnore

@@ -1,8 +1,6 @@
 package com.example.demo.dao.exercise;
 
-import com.example.demo.dao.workout.WorkoutDAOImpl;
 import com.example.demo.entity.*;
-import com.example.demo.entity.request.ExerciseLogData;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -61,12 +59,7 @@ public class ExerciseDAOImpl implements ExerciseDAO {
     public void saveExercise(User user, Exercise exercise, String category) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        Query<ExerciseCategory> theQuery =
-                currentSession.createQuery("FROM ExerciseCategory WHERE category=:category", ExerciseCategory.class);
-        theQuery.setParameter("category", category);
-
-        ExerciseCategory exerciseCategory = theQuery.getSingleResult();
-        exercise.setExerciseCategory(exerciseCategory);
+        exercise.setExerciseCategory(getCategoryByName(category));
 
         user.addExercise(exercise);
 
@@ -75,38 +68,34 @@ public class ExerciseDAOImpl implements ExerciseDAO {
 
     /** Add existing exercise to workout (user is already set) **/
     @Override
-    public void addExerciseToWorkout(int exerciseId, int workoutId) {
+    public void addExerciseToWorkout(Exercise exercise, Workout workout) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        Workout workout = new WorkoutDAOImpl().getWorkout(workoutId);
-        Exercise exercise = getExercise(exerciseId);
         workout.addExercise(exercise);
         workout.setExerciseAmount(workout.getExerciseAmount() + 1);
 
-        currentSession.saveOrUpdate(exercise);
+        currentSession.saveOrUpdate(workout);
     }
 
     /** Create a new exercise and add it to a workout as one operation **/
     @Override
-    public void addNewExerciseToWorkout(User user, int workoutId, Exercise exercise, String category) {
-        Session currentSession = sessionFactory.getCurrentSession();
+    public void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category) {
+        Session currentSession = sessionFactory.openSession();
+        currentSession.beginTransaction();
 
-        Workout workout = new WorkoutDAOImpl().getWorkout(workoutId);
-
-        Query<ExerciseCategory> theQuery =
-                currentSession.createQuery("FROM ExerciseCategory WHERE category=:category", ExerciseCategory.class);
-        theQuery.setParameter("category", category);
-
-        ExerciseCategory exerciseCategory = theQuery.getSingleResult();
-        exercise.setExerciseCategory(exerciseCategory);
-
+        exercise.setExerciseCategory(getCategoryByName(category));
         user.addExercise(exercise);
+        currentSession.save(exercise);
+        currentSession.getTransaction().commit();
+
+        currentSession.getTransaction().begin();
+        currentSession.load(Workout.class,workout.getId());
         workout.addExercise(exercise);
-
-        currentSession.saveOrUpdate(exercise);
-
         workout.setExerciseAmount(workout.getExerciseAmount() + 1);
-        currentSession.saveOrUpdate(workout);
+        currentSession.update(workout);
+        currentSession.getTransaction().commit();
+        currentSession.close();
+
     }
 
     /** Get an exercise using its ID **/

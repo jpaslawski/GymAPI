@@ -1,10 +1,7 @@
 package com.example.demo.service.exercise;
 
 import com.example.demo.dao.exercise.ExerciseDAO;
-import com.example.demo.entity.Exercise;
-import com.example.demo.entity.ExerciseCategory;
-import com.example.demo.entity.ExerciseLog;
-import com.example.demo.entity.User;
+import com.example.demo.entity.*;
 import com.example.demo.entity.request.ExerciseLogData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,8 +42,14 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
-    public void addExerciseToWorkout(int exerciseId, int workoutId) {
-        exerciseDAO.addExerciseToWorkout(exerciseId, workoutId);
+    public void addExerciseToWorkout(Exercise exercise, Workout workout) {
+        exerciseDAO.addExerciseToWorkout(exercise, workout);
+    }
+
+    @Override
+    @Transactional
+    public void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category) {
+        exerciseDAO.addNewExerciseToWorkout(user, workout, exercise, category);
     }
 
     @Override
@@ -95,11 +98,5 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Transactional
     public List<ExerciseCategory> getCategories() {
         return exerciseDAO.getCategories();
-    }
-
-    @Override
-    @Transactional
-    public void addNewExerciseToWorkout(User user, int workoutId, Exercise exercise, String category) {
-        exerciseDAO.addNewExerciseToWorkout(user, workoutId, exercise, category);
     }
 }

@@ -2,10 +2,12 @@ package com.example.demo.rest.exercise;
 
 import com.example.demo.entity.Exercise;
 import com.example.demo.entity.User;
+import com.example.demo.entity.Workout;
 import com.example.demo.entity.request.ExerciseData;
 import com.example.demo.rest.ObjectNotFoundException;
 import com.example.demo.service.exercise.ExerciseService;
 import com.example.demo.service.user.UserService;
+import com.example.demo.service.workout.WorkoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,9 @@ public class ExerciseRestController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private WorkoutService workoutService;
 
     @GetMapping("/exercises")
     public List<Exercise> getExercises() {
@@ -93,7 +98,11 @@ public class ExerciseRestController {
         User user = userService.getUserFromToken(header);
 
         Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), false);
-        exerciseService.addNewExerciseToWorkout(user, workoutId, exercise, exerciseData.getCategory());
+        exercise.setId(0);
+
+        Workout workout = workoutService.getWorkout(workoutId);
+
+        exerciseService.addNewExerciseToWorkout(user, workout, exercise, exerciseData.getCategory());
 
         return ResponseEntity.ok(exerciseService.getExercisesByWorkoutId(workoutId));
     }
@@ -110,7 +119,10 @@ public class ExerciseRestController {
     @PutMapping("/exercises/{exerciseId}/{workoutId}")
     public String addExerciseToWorkout(@PathVariable int exerciseId,@PathVariable int workoutId) {
 
-        exerciseService.addExerciseToWorkout(exerciseId, workoutId);
+        Workout workout = workoutService.getWorkout(workoutId);
+        Exercise exercise = exerciseService.getExercise(exerciseId);
+
+        exerciseService.addExerciseToWorkout(exercise, workout);
 
         return "Exercise " + exerciseId + " added to workout " + workoutId;
     }

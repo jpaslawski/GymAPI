@@ -1,7 +1,5 @@
 package com.example.demo.dao.workout;
 
-import com.example.demo.dao.user.UserDAOImpl;
-import com.example.demo.entity.Exercise;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import org.hibernate.Session;
@@ -20,26 +18,32 @@ public class WorkoutDAOImpl implements WorkoutDAO {
 
     /** Get a list of all the workouts **/
     @Override
-    public List<Workout> getWorkouts() {
+    public List<Workout> getWorkouts(User user) {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Workout> theQuery =
-                currentSession.createQuery("FROM Workout", Workout.class);
+                currentSession.createQuery("FROM Workout WHERE author=:user", Workout.class);
+        theQuery.setParameter("user", user);
 
         return theQuery.getResultList();
     }
 
-    /** Get a list of all workouts of the given user **/
     @Override
-    public List<Workout> getWorkoutsByUserId(int userId) {
+    public List<Workout> getPublicWorkouts() {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Workout> theQuery =
-                currentSession.createQuery("FROM Workout WHERE author=:userId", Workout.class);
-        theQuery.setParameter("userId", userId);
+                currentSession.createQuery("FROM Workout WHERE isPublic=true", Workout.class);
         return theQuery.getResultList();
     }
 
+    /** Get a workout using its ID **/
+    @Override
+    public Workout getWorkout(int workoutId) {
+
+        Workout workout = sessionFactory.getCurrentSession().find(Workout.class, workoutId);
+        return workout;
+    }
 
     /** Save or update a workout **/
     @Override
@@ -53,14 +57,6 @@ public class WorkoutDAOImpl implements WorkoutDAO {
         currentSession.saveOrUpdate(workout);
     }
 
-    /** Get a workout using its ID **/
-    @Override
-    public Workout getWorkout(int workoutId) {
-
-        Workout workout = sessionFactory.getCurrentSession().find(Workout.class, workoutId);
-        return workout;
-    }
-
     /** Delete a workout by ID **/
     @Override
     public void deleteWorkout(int workoutId) {
@@ -68,10 +64,7 @@ public class WorkoutDAOImpl implements WorkoutDAO {
         Session currentSession = sessionFactory.getCurrentSession();
         Workout workout = currentSession.find(Workout.class, workoutId);
 
-        for (Exercise exercise : workout.getExercises()) {
-            workout.removeExercise(exercise);
-        }
-
+        workout.getExercises().clear();
         currentSession.remove(workout);
     }
 }

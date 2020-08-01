@@ -105,6 +105,22 @@ public class ExerciseDAOImpl implements ExerciseDAO {
         return exercise;
     }
 
+    /** Get the last exercise of a user **/
+    @Override
+    public Exercise getLastExercise(User user) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<ExerciseLog> logQuery =
+                currentSession.createQuery("FROM ExerciseLog WHERE trainee=:user ORDER BY id DESC", ExerciseLog.class);
+        logQuery.setParameter("user", user);
+
+        ExerciseLog exerciseLog = logQuery.setMaxResults(1).getSingleResult();
+
+        Exercise exercise = sessionFactory.getCurrentSession().find(Exercise.class, exerciseLog.getReferredExercise().getId());
+
+        return exercise;
+    }
+
     /** Delete an exercise by ID **/
     @Override
     public void deleteExercise(int exerciseId) {
@@ -126,7 +142,6 @@ public class ExerciseDAOImpl implements ExerciseDAO {
         Exercise exercise = currentSession.find(Exercise.class, exerciseId);
 
         workout.removeExercise(exercise);
-
         workout.setExerciseAmount(workout.getExerciseAmount() - 1);
     }
 
@@ -164,9 +179,10 @@ public class ExerciseDAOImpl implements ExerciseDAO {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<ExerciseLog> theQuery =
-                currentSession.createQuery("FROM ExerciseLog WHERE trainee=:user AND referredExercise=:exercise ORDER BY submitDate DESC", ExerciseLog.class);
+                currentSession.createQuery("FROM ExerciseLog WHERE trainee=:user AND referredExercise=:exercise ORDER BY id DESC", ExerciseLog.class);
         theQuery.setParameter("user", user);
         theQuery.setParameter("exercise", exercise);
+
         return theQuery.getResultList();
     }
 

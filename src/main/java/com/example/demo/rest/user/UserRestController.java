@@ -1,10 +1,15 @@
 package com.example.demo.rest.user;
 
+import com.example.demo.HelperMethods;
+import com.example.demo.entity.UserDiet;
+import com.example.demo.entity.WeightLog;
 import com.example.demo.entity.request.AuthenticationRequest;
+import com.example.demo.entity.request.UserUpdateData;
 import com.example.demo.entity.response.AuthenticationResponse;
 import com.example.demo.entity.User;
-import com.example.demo.entity.request.UserData;
+import com.example.demo.entity.request.NewUserData;
 import com.example.demo.rest.ObjectNotFoundException;
+import com.example.demo.service.exercise.ExerciseService;
 import com.example.demo.service.user.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +32,9 @@ public class UserRestController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ExerciseService exerciseService;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers() {
@@ -52,19 +61,19 @@ public class UserRestController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<User> getUser(@PathVariable int userId) {
+    @GetMapping("/users/details")
+    public ResponseEntity<User> getUser(@RequestHeader (name="Authorization") String header) {
 
-        User user = userService.getUser(userId);
+        User user = userService.getUserFromToken(header);
 
         if (user == null) {
-            throw new ObjectNotFoundException("User id not found - " + userId);
+            ResponseEntity.notFound();
         }
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<User> addUser(@RequestBody UserData newAccount) {
+    public ResponseEntity<User> addUser(@RequestBody NewUserData newAccount) {
 
         // Check if username, email and password is not empty
         if (newAccount.getUsername().isEmpty() || newAccount.getUsername() == null) {
@@ -86,10 +95,12 @@ public class UserRestController {
             throw new ObjectNotFoundException("An account with this email already exists!");
         }
 
-        User user = new User(newAccount.getUsername(), newAccount.getEmail(), newAccount.getPassword(), 0.0f, 0.0f, 0, "ROLE_USER");
+        User user = new User(newAccount.getUsername(), newAccount.getEmail(), newAccount.getPassword(), 0.0f, 0.0f, LocalDate.now(), "Undefined", 1.2f, "ROLE_USER");
+        UserDiet userDiet = new UserDiet(30, 50, 20, 0,0, user);
 
         user.setId(0);
-        userService.saveUser(user);
+        userDiet.setId(0);
+        userService.saveUser(user, userDiet);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -118,6 +129,7 @@ public class UserRestController {
                         .compact();
 
                 authenticationResponse.setToken(token);
+                authenticationResponse.setRole(user.getPermissions());
 
                 return new ResponseEntity<>(authenticationResponse, HttpStatus.ACCEPTED);
             }
@@ -127,22 +139,34 @@ public class UserRestController {
     }
 
     @PutMapping("/users")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        userService.saveUser(user);
+    public ResponseEntity<User> updateUser(@RequestHeader (name="Authorization") String header, @RequestBody UserUpdateData updatedUser) {
+        User oldUserData = userService.getUserFromToken(header);
 
-        return ResponseEntity.ok(user);
+        oldUserData.setUsername(updatedUser.getUsername());
+        oldUserData.setDateOfBirth(updatedUser.getDateOfBirth());
+        oldUserData.setHeight(updatedUser.getHeight());
+        oldUserData.setWeight(updatedUser.getWeight());
+        oldUserData.setGender(updatedUser.getGender());
+        oldUserData.setExerciseLevel(updatedUser.getExerciseLevel());
+
+        UserDiet userDiet = userService.getUserDietDetails(oldUserData);
+        userDiet.setTotalCalories(new HelperMethods().countTotalCalories(oldUserData));
+
+        userService.saveUser(oldUserData, userDiet);
+
+        return ResponseEntity.ok(oldUserData);
     }
 
-    @DeleteMapping("/users/{userId}")
-    public ResponseEntity<Object> deleteUser(@PathVariable int userId) {
+    @DeleteMapping("/users")
+    public ResponseEntity<Object> deleteUser(@RequestHeader (name="Authorization") String header) {
 
-        User tempUser = userService.getUser(userId);
+        User tempUser = userService.getUserFromToken(header);
 
         if (tempUser == null) {
-            throw new ObjectNotFoundException("User id not found - " + userId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        userService.deleteUser(userId);
+        userService.deleteUser(tempUser.getId());
 
         return ResponseEntity.noContent().build();
     }

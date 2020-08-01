@@ -45,6 +45,7 @@ public class Exercise {
     @JoinColumn(name = "author")
     private User author;
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER,
             mappedBy = "referredExercise",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,

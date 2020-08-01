@@ -25,9 +25,20 @@ public class WorkoutRestController {
     private UserService userService;
 
     @GetMapping("/workouts")
-    public ResponseEntity<List<Workout>> getWorkouts() {
+    public ResponseEntity<List<Workout>> getWorkouts(@RequestHeader (name="Authorization") String header) {
+        User user = userService.getUserFromToken(header);
+        List<Workout> workoutList = workoutService.getWorkouts(user);
 
-        List<Workout> workoutList = workoutService.getWorkouts();
+        if(workoutList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(workoutList);
+    }
+
+    @GetMapping("/workouts/public")
+    public ResponseEntity<List<Workout>> getPublicWorkouts() {
+        List<Workout> workoutList = workoutService.getPublicWorkouts();
 
         if(workoutList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -45,17 +56,6 @@ public class WorkoutRestController {
             throw new ObjectNotFoundException("User id not found - " + workoutId);
         }
         return ResponseEntity.ok(workout);
-    }
-
-    @GetMapping(value = "/workouts", params = "user", produces="application/json")
-    public ResponseEntity<List<Workout>> getWorkoutsByUserId(@RequestParam("user") int userId) {
-        List<Workout> userWorkoutList = workoutService.getWorkoutsByUserId(userId);
-
-        if(userWorkoutList.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(userWorkoutList);
     }
 
     @PostMapping("/workouts")
@@ -91,16 +91,15 @@ public class WorkoutRestController {
     }
 
     @DeleteMapping("/workouts/{workoutId}")
-    public String deleteWorkout(@PathVariable int workoutId) {
+    public ResponseEntity<?> deleteWorkout(@PathVariable int workoutId) {
 
         Workout tempWorkout = workoutService.getWorkout(workoutId);
 
         if (tempWorkout == null) {
-            throw new ObjectNotFoundException("Workout id not found - " + workoutId);
+            return ResponseEntity.notFound().build();
         }
-
         workoutService.deleteWorkout(workoutId);
 
-        return "Deleted workout id - " + workoutId;
+        return ResponseEntity.noContent().build();
     }
 }

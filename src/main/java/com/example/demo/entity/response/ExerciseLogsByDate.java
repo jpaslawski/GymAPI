@@ -10,6 +10,10 @@ public class ExerciseLogsByDate {
 
     private LocalDate date;
 
+    private double averageWeight;
+
+    private double oneRepMax;
+
     private Set<ExerciseLog> exerciseLogSet = new HashSet<>();
 
     public ExerciseLogsByDate() {
@@ -22,6 +26,22 @@ public class ExerciseLogsByDate {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public double getAverageWeight() {
+        return averageWeight;
+    }
+
+    public void setAverageWeight(double averageWeight) {
+        this.averageWeight = averageWeight;
+    }
+
+    public double getOneRepMax() {
+        return oneRepMax;
+    }
+
+    public void setOneRepMax(double oneRepMax) {
+        this.oneRepMax = oneRepMax;
     }
 
     public Set<ExerciseLog> getExerciseLogSet() {

@@ -1,22 +1,55 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import javax.persistence.*;
+import java.util.List;
+
+@Entity(name = "Meal")
+@Table(name="meal")
 public class Meal {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "meal_id")
     private int id;
 
+    @Column(name = "meal_name")
     private String name;
 
+    @Column(name = "meal_calories")
     private float calories;
 
+    @Column(name = "meal_protein")
     private float protein;
 
+    @Column(name = "meal_carbs")
     private float carbs;
 
+    @Column(name = "meal_fat")
     private float fat;
 
+    @Column(name = "meal_portion_weight")
     private float portionWeight;
 
+    @Column(name = "meal_isPublic")
+    private boolean isPublic;
+
+    @JsonIgnore
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "meal_user")
     private User user;
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.EAGER,
+            mappedBy = "referredMeal",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+                    CascadeType.DETACH, CascadeType.REFRESH})
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<MealLog> mealLogs;
 
     public Meal() {
     }
@@ -86,11 +119,27 @@ public class Meal {
         this.portionWeight = portionWeight;
     }
 
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<MealLog> getMealLogs() {
+        return mealLogs;
+    }
+
+    public void setMealLogs(List<MealLog> mealLogs) {
+        this.mealLogs = mealLogs;
     }
 }

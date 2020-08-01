@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface WorkoutService {
 
-    List<Workout> getWorkouts();
+    List<Workout> getWorkouts(User user);
 
-    List<Workout> getWorkoutsByUserId(int userId);
+    List<Workout> getPublicWorkouts();
 
     void saveWorkout(User user, Workout workout);
 

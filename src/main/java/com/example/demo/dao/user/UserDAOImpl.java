@@ -1,6 +1,8 @@
 package com.example.demo.dao.user;
 
 import com.example.demo.entity.User;
+import com.example.demo.entity.UserDiet;
+import com.example.demo.entity.WeightLog;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -43,23 +46,13 @@ public class UserDAOImpl implements UserDAO {
 
     /** Save or update user account information - Sign Up **/
     @Override
-    public void saveUser(User user) {
+    public void saveUser(User user, UserDiet userDiet) {
 
         Session currentSession = sessionFactory.getCurrentSession();
 
         currentSession.saveOrUpdate(user);
+        currentSession.saveOrUpdate(userDiet);
 
-    }
-
-    /** Get user account information **/
-    @Override
-    public User getUser(int id) {
-
-        Session currentSession = sessionFactory.getCurrentSession();
-
-        User user = currentSession.get(User.class, id);
-
-        return user;
     }
 
     /** Get user account information by providing his email **/
@@ -92,5 +85,70 @@ public class UserDAOImpl implements UserDAO {
         theQuery.setParameter("userId", userId);
 
         theQuery.executeUpdate();
+    }
+
+    @Override
+    public List<WeightLog> getWeightLogs(User user) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        Query<WeightLog> theQuery =
+                currentSession.createQuery("FROM WeightLog WHERE user=:user", WeightLog.class);
+        theQuery.setParameter("user", user);
+
+        return theQuery.getResultList();
+    }
+
+    @Override
+    public WeightLog getCurrentWeight(User user) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        Query<WeightLog> theQuery =
+                currentSession.createQuery("FROM WeightLog WHERE user=:user ORDER BY id DESC", WeightLog.class);
+        theQuery.setParameter("user", user);
+
+        return theQuery.setMaxResults(1).getSingleResult();
+    }
+
+    @Override
+    public boolean checkTodayWeightLog(User user) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        LocalDate now = LocalDate.now();
+        Query<WeightLog> theQuery =
+                currentSession.createQuery("FROM WeightLog WHERE user=:user AND submitDate=:now", WeightLog.class);
+        theQuery.setParameter("user", user);
+        theQuery.setParameter("now", now);
+
+        if(theQuery.getResultList().size() != 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void saveWeightLog(WeightLog weightLog, User user) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        user.addWeightLog(weightLog);
+        currentSession.saveOrUpdate(weightLog);
+
+        user.setWeight(weightLog.getCurrentWeight());
+        currentSession.saveOrUpdate(user);
+    }
+
+    @Override
+    public UserDiet getUserDietDetails(User user) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<UserDiet> theQuery =
+                currentSession.createQuery("FROM UserDiet WHERE user=:user", UserDiet.class);
+        theQuery.setParameter("user", user);
+
+        return theQuery.setMaxResults(1).getSingleResult();
+    }
+
+    @Override
+    public void saveUserDietDetails(UserDiet userDiet) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        currentSession.saveOrUpdate(userDiet);
     }
 }

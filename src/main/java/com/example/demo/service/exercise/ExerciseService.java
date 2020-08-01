@@ -1,7 +1,6 @@
 package com.example.demo.service.exercise;
 
 import com.example.demo.entity.*;
-import com.example.demo.entity.request.ExerciseLogData;
 
 import java.util.List;
 import java.util.Set;
@@ -23,6 +22,8 @@ public interface ExerciseService {
     void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);
 
     Exercise getExercise(int exerciseId);
+
+    Exercise getLastExercise(User user);
 
     void deleteExercise(int exerciseId);
 

@@ -17,14 +17,14 @@ public class WorkoutServiceImpl implements WorkoutService {
 
     @Override
     @Transactional
-    public List<Workout> getWorkouts() {
-        return workoutDAO.getWorkouts();
+    public List<Workout> getWorkouts(User user) {
+        return workoutDAO.getWorkouts(user);
     }
 
     @Override
     @Transactional
-    public List<Workout> getWorkoutsByUserId(int userId) {
-        return workoutDAO.getWorkoutsByUserId(userId);
+    public List<Workout> getPublicWorkouts() {
+        return workoutDAO.getPublicWorkouts();
     }
 
     @Override

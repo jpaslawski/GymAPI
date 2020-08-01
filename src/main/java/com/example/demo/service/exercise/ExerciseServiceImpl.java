@@ -2,7 +2,6 @@ package com.example.demo.service.exercise;
 
 import com.example.demo.dao.exercise.ExerciseDAO;
 import com.example.demo.entity.*;
-import com.example.demo.entity.request.ExerciseLogData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +67,12 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Transactional
     public List<ExerciseLog> getExerciseLogs(Exercise exercise, User user) {
         return exerciseDAO.getExerciseLogs(exercise, user);
+    }
+
+    @Override
+    @Transactional
+    public Exercise getLastExercise(User user) {
+        return exerciseDAO.getLastExercise(user);
     }
 
     @Override

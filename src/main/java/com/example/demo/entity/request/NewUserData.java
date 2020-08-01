@@ -1,6 +1,6 @@
 package com.example.demo.entity.request;
 
-public class UserData {
+public class NewUserData {
 
     private String username;
 
@@ -8,11 +8,11 @@ public class UserData {
 
     private String password;
 
-    public UserData() {
+    public NewUserData() {
 
     }
 
-    public UserData(String username, String email, String password) {
+    public NewUserData(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;

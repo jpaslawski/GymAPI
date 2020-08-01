@@ -4,7 +4,6 @@ import com.example.demo.entity.Exercise;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import com.example.demo.entity.request.ExerciseData;
-import com.example.demo.rest.ObjectNotFoundException;
 import com.example.demo.service.exercise.ExerciseService;
 import com.example.demo.service.user.UserService;
 import com.example.demo.service.workout.WorkoutService;
@@ -59,21 +58,32 @@ public class ExerciseRestController {
     }
 
     @GetMapping("/exercises/{exerciseId}")
-    public Exercise getExercise(@PathVariable int exerciseId) {
+    public ResponseEntity<Exercise> getExercise(@PathVariable int exerciseId) {
 
         Exercise exercise = exerciseService.getExercise(exerciseId);
 
         if (exercise == null) {
-            throw new ObjectNotFoundException("Exercise id not found - " + exerciseId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return exercise;
+        return ResponseEntity.ok(exercise);
+    }
+
+    @GetMapping("/exercises/last")
+    public ResponseEntity<Exercise> getLastExercise(@RequestHeader (name="Authorization") String header) {
+        User user = userService.getUserFromToken(header);
+        Exercise exercise = exerciseService.getLastExercise(user);
+
+        if (exercise == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(exercise);
     }
 
     @PostMapping("/exercises")
-    public Exercise addExercise(@RequestHeader (name="Authorization") String header, @RequestBody ExerciseData exerciseData) {
+    public ResponseEntity<?> addExercise(@RequestHeader (name="Authorization") String header, @RequestBody ExerciseData exerciseData) {
 
         if (exerciseData.getName().isEmpty() || exerciseData.getName() == null) {
-            throw new ObjectNotFoundException("Exercise name cannot be empty, you have to provide one!");
+            return new ResponseEntity<>("The name field is empty!", HttpStatus.BAD_REQUEST);
         }
 
         User user = userService.getUserFromToken(header);
@@ -83,7 +93,7 @@ public class ExerciseRestController {
 
         exerciseService.saveExercise(user, exercise, exerciseData.getCategory());
 
-        return exercise;
+        return ResponseEntity.ok(exercise);
     }
 
     @PostMapping("/exercises/{workoutId}")
@@ -117,40 +127,39 @@ public class ExerciseRestController {
     }
 
     @PutMapping("/exercises/{exerciseId}/{workoutId}")
-    public String addExerciseToWorkout(@PathVariable int exerciseId,@PathVariable int workoutId) {
+    public ResponseEntity<String> addExerciseToWorkout(@PathVariable int exerciseId,@PathVariable int workoutId, @RequestBody ExerciseData updatedExercise) {
 
         Workout workout = workoutService.getWorkout(workoutId);
         Exercise exercise = exerciseService.getExercise(exerciseId);
 
         exerciseService.addExerciseToWorkout(exercise, workout);
 
-        return "Exercise " + exerciseId + " added to workout " + workoutId;
+        return ResponseEntity.ok("Exercise " + exerciseId + " added to workout " + workoutId);
     }
 
     @DeleteMapping("/exercises/{exerciseId}")
-    public String deleteExercise(@PathVariable int exerciseId) {
+    public ResponseEntity<String> deleteExercise(@PathVariable int exerciseId) {
 
         Exercise tempExercise = exerciseService.getExercise(exerciseId);
 
         if (tempExercise == null) {
-            throw new ObjectNotFoundException("Exercise id not found - " + exerciseId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         exerciseService.deleteExercise(exerciseId);
 
-        return "Deleted exercise id - " + exerciseId;
+        return ResponseEntity.ok("Deleted exercise id - " + exerciseId);
     }
 
     @DeleteMapping("/exercises/{exerciseId}/{workoutId}")
-    public String deleteExerciseFromWorkout(@PathVariable int exerciseId, @PathVariable int workoutId) {
+    public ResponseEntity<String> deleteExerciseFromWorkout(@PathVariable int exerciseId, @PathVariable int workoutId) {
         Exercise tempExercise = exerciseService.getExercise(exerciseId);
-
         if (tempExercise == null) {
-            throw new ObjectNotFoundException("Exercise id not found - " + exerciseId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         exerciseService.deleteExerciseFromWorkout(exerciseId, workoutId);
 
-        return "Deleted exercise id - " + exerciseId;
+        return ResponseEntity.ok("Exercise " + exerciseId + " deleted from workout " + workoutId);
     }
 }

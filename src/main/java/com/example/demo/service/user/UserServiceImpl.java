@@ -2,6 +2,8 @@ package com.example.demo.service.user;
 
 import com.example.demo.dao.user.UserDAO;
 import com.example.demo.entity.User;
+import com.example.demo.entity.UserDiet;
+import com.example.demo.entity.WeightLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void saveUser(User user) {
-        userDAO.saveUser(user);
-    }
-
-    @Override
-    @Transactional
-    public User getUser(int userId) {
-        return userDAO.getUser(userId);
+    public void saveUser(User user, UserDiet userDiet) {
+        userDAO.saveUser(user, userDiet);
     }
 
     @Override
@@ -50,4 +46,39 @@ public class UserServiceImpl implements UserService {
         userDAO.deleteUser(userId);
     }
 
+    @Override
+    @Transactional
+    public List<WeightLog> getWeightLogs(User user) {
+        return userDAO.getWeightLogs(user);
+    }
+
+    @Override
+    @Transactional
+    public WeightLog getCurrentWeight(User user) {
+        return userDAO.getCurrentWeight(user);
+    }
+
+    @Override
+    @Transactional
+    public boolean checkTodayWeightLog(User user) {
+        return userDAO.checkTodayWeightLog(user);
+    }
+
+    @Override
+    @Transactional
+    public void saveWeightLog(WeightLog weightLog, User user) {
+        userDAO.saveWeightLog(weightLog, user);
+    }
+
+    @Override
+    @Transactional
+    public UserDiet getUserDietDetails(User user) {
+        return userDAO.getUserDietDetails(user);
+    }
+
+    @Override
+    @Transactional
+    public void saveUserDietDetails(UserDiet userDiet) {
+        userDAO.saveUserDietDetails(userDiet);
+    }
 }

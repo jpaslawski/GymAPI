@@ -1,44 +1,40 @@
 package com.example.demo.dao.exercise;
 
 import com.example.demo.entity.*;
-import com.example.demo.entity.request.ExerciseLogData;
 
 import java.util.List;
 import java.util.Set;
 
 public interface ExerciseDAO {
 
-    /********************* Exercise methods *********************/
+    public List<Exercise> getExercises();
 
-    List<Exercise> getExercises();
+    public Set<Exercise> getExercisesByWorkoutId(int workoutId);
 
-    Set<Exercise> getExercisesByWorkoutId(int workoutId);
+    public Set<Exercise> getExercisesByCategory(String category);
 
-    Set<Exercise> getExercisesByCategory(String category);
+    public void saveExercise(User user, Exercise exercise, String category);
 
-    void saveExercise(User user, Exercise exercise, String category);
+    public void addExerciseToWorkout(Exercise exercise, Workout workout);
 
-    void addExerciseToWorkout(Exercise exercise, Workout workout);
+    public void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);
 
-    void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);
+    public Exercise getExercise(int exerciseId);
 
-    Exercise getExercise(int exerciseId);
+    public Exercise getLastExercise(User user);
 
-    void deleteExercise(int exerciseId);
+    public void deleteExercise(int exerciseId) ;
 
-    void deleteExerciseFromWorkout(int exerciseId, int workoutId);
+    public void deleteExerciseFromWorkout(int exerciseId, int workoutId);
 
-    /********************* Exercise Categories methods *********************/
+    public ExerciseCategory getCategoryByName(String category);
 
-    ExerciseCategory getCategoryByName(String category);
+    public List<ExerciseCategory> getCategories();
 
-    List<ExerciseCategory> getCategories();
+    public void addExerciseCategory(ExerciseCategory exerciseCategory);
 
-    void addExerciseCategory(ExerciseCategory exerciseCategory);
+    public List<ExerciseLog> getExerciseLogs(Exercise exercise, User user);
 
-    /********************* Exercise Logs methods *********************/
-
-    List<ExerciseLog> getExerciseLogs(Exercise exercise, User user);
-
-    void addExerciseLog(User user, ExerciseLog exerciseLog);
+    public void addExerciseLog(User user, ExerciseLog exerciseLog);
 }
+

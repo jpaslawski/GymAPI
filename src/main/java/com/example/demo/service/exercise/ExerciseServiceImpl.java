@@ -41,6 +41,12 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
+    public void updateExercise(Exercise exercise, String category) {
+        exerciseDAO.updateExercise(exercise, category);
+    }
+
+    @Override
+    @Transactional
     public void addExerciseToWorkout(Exercise exercise, Workout workout) {
         exerciseDAO.addExerciseToWorkout(exercise, workout);
     }

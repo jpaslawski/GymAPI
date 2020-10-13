@@ -41,19 +41,19 @@ public class WorkoutDAOImpl implements WorkoutDAO {
     @Override
     public Workout getWorkout(int workoutId) {
 
-        Workout workout = sessionFactory.getCurrentSession().find(Workout.class, workoutId);
-        return workout;
+        return sessionFactory.getCurrentSession().find(Workout.class, workoutId);
     }
 
     /** Save or update a workout **/
     @Override
     public void saveWorkout(User user, Workout workout) {
-
         Session currentSession = sessionFactory.getCurrentSession();
 
+        // Set workout author and add it to workout set of the given user
         workout.setAuthor(user);
         user.addWorkout(workout);
 
+        // Save or Update the workout
         currentSession.saveOrUpdate(workout);
     }
 

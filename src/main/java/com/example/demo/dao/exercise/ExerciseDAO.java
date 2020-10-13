@@ -7,34 +7,36 @@ import java.util.Set;
 
 public interface ExerciseDAO {
 
-    public List<Exercise> getExercises();
+    List<Exercise> getExercises();
 
-    public Set<Exercise> getExercisesByWorkoutId(int workoutId);
+    Set<Exercise> getExercisesByWorkoutId(int workoutId);
 
-    public Set<Exercise> getExercisesByCategory(String category);
+    Set<Exercise> getExercisesByCategory(String category);
 
-    public void saveExercise(User user, Exercise exercise, String category);
+    void saveExercise(User user, Exercise exercise, String category);
 
-    public void addExerciseToWorkout(Exercise exercise, Workout workout);
+    void updateExercise(Exercise exercise, String category);
 
-    public void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);
+    void addExerciseToWorkout(Exercise exercise, Workout workout);
 
-    public Exercise getExercise(int exerciseId);
+    void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);
 
-    public Exercise getLastExercise(User user);
+    Exercise getExercise(int exerciseId);
 
-    public void deleteExercise(int exerciseId) ;
+    Exercise getLastExercise(User user);
 
-    public void deleteExerciseFromWorkout(int exerciseId, int workoutId);
+    void deleteExercise(int exerciseId) ;
 
-    public ExerciseCategory getCategoryByName(String category);
+    void deleteExerciseFromWorkout(int exerciseId, int workoutId);
 
-    public List<ExerciseCategory> getCategories();
+    ExerciseCategory getCategoryByName(String category);
 
-    public void addExerciseCategory(ExerciseCategory exerciseCategory);
+    List<ExerciseCategory> getCategories();
 
-    public List<ExerciseLog> getExerciseLogs(Exercise exercise, User user);
+    void addExerciseCategory(ExerciseCategory exerciseCategory);
 
-    public void addExerciseLog(User user, ExerciseLog exerciseLog);
+    List<ExerciseLog> getExerciseLogs(Exercise exercise, User user);
+
+    void addExerciseLog(User user, ExerciseLog exerciseLog);
 }
 

@@ -37,11 +37,9 @@ public class Workout {
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name="workout_exercise",
+    @JoinTable(name="workout_exercise",
             joinColumns = { @JoinColumn(name="workout_id")},
-            inverseJoinColumns = { @JoinColumn(name ="exercise_id")}
-    )
+            inverseJoinColumns = { @JoinColumn(name ="exercise_id")})
     private Set<Exercise> exercises = new HashSet<>();
 
     public Workout() {

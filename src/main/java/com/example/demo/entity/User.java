@@ -48,6 +48,7 @@ public class User {
             mappedBy = "author",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH})
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Workout> workouts;
 
     @OneToMany(fetch = FetchType.EAGER,

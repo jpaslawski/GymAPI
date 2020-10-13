@@ -36,7 +36,7 @@ public class UserRestController {
     @Autowired
     private ExerciseService exerciseService;
 
-    @GetMapping("/users")
+    @GetMapping("/admin/users")
     public ResponseEntity<List<User>> getUsers() {
 
         List<User> userList = userService.getUsers();
@@ -129,7 +129,6 @@ public class UserRestController {
                         .compact();
 
                 authenticationResponse.setToken(token);
-                authenticationResponse.setRole(user.getPermissions());
 
                 return new ResponseEntity<>(authenticationResponse, HttpStatus.ACCEPTED);
             }

@@ -1,6 +1,8 @@
 package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -18,10 +20,11 @@ public class ExerciseCategory {
     private String category;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER,
+    @OneToMany(fetch = FetchType.LAZY,
             mappedBy = "exerciseCategory",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            cascade = {CascadeType.PERSIST,
                     CascadeType.DETACH, CascadeType.REFRESH})
+    @Fetch(value = FetchMode.SUBSELECT)
     private Set<Exercise> connectedExercises;
 
     public ExerciseCategory() {

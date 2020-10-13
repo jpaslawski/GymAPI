@@ -60,10 +60,18 @@ public class ExerciseDAOImpl implements ExerciseDAO {
         Session currentSession = sessionFactory.getCurrentSession();
 
         exercise.setExerciseCategory(getCategoryByName(category));
-
+        exercise.setAuthor(user);
         user.addExercise(exercise);
 
-        currentSession.saveOrUpdate(exercise);
+        currentSession.save(exercise);
+    }
+
+    @Override
+    public void updateExercise(Exercise exercise, String category) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        exercise.setExerciseCategory(getCategoryByName(category));
+
+        currentSession.merge(exercise);
     }
 
     /** Add existing exercise to workout (user is already set) **/
@@ -101,8 +109,7 @@ public class ExerciseDAOImpl implements ExerciseDAO {
     /** Get an exercise using its ID **/
     @Override
     public Exercise getExercise(int exerciseId) {
-        Exercise exercise = sessionFactory.getCurrentSession().find(Exercise.class, exerciseId);
-        return exercise;
+        return sessionFactory.getCurrentSession().find(Exercise.class, exerciseId);
     }
 
     /** Get the last exercise of a user **/

@@ -17,6 +17,8 @@ public interface ExerciseService {
 
     void saveExercise(User user, Exercise exercise, String category);
 
+    void updateExercise(Exercise exercise, String category);
+
     void addExerciseToWorkout(Exercise exercise, Workout workout);
 
     void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);

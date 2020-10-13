@@ -9,11 +9,12 @@ import io.jsonwebtoken.Jwts;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
 
 @Repository
@@ -25,11 +26,17 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public User getUserFromToken(String header) {
 
-        // Parse token trough signing key
-        Jws<Claims> claimsJws = Jwts.parser().setSigningKey("iFuZc|_6D{UBn(A".getBytes(StandardCharsets.UTF_8))
-                .parseClaimsJws(header.replace("Bearer ", ""));
+        // Get payload from token
+        String s1 = header.substring(header.indexOf(".") + 1);
+        String s2 = s1.substring(s1.indexOf("."));
+        String payloadBase64 = s1.replace(s2, "");
 
-        return getUserByEmail(claimsJws.getBody().get("email").toString());
+        // Decode payload and extract email
+        byte[] decodedPayloadBytes = Base64.getDecoder().decode(payloadBase64.getBytes());
+        JSONObject jsonObject = new JSONObject(new String(decodedPayloadBytes));
+        String email = jsonObject.getString("email");
+
+        return getUserByEmail(email);
     }
 
     /** Get a list of all the users **/

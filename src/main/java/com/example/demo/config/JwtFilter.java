@@ -1,6 +1,9 @@
 package com.example.demo.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,39 +27,53 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (!request.getRequestURI().contains("/authenticate") && !request.getRequestURI().contains("/create")) {
             final String header = request.getHeader("Authorization");
-            System.out.println(header);
-            UsernamePasswordAuthenticationToken authResult = getAuthenticationByToken(header);
-            if (authResult == null) {
-                throw new ServletException("This request is not authorized!");
+
+            // Token not provided in request header
+            if (header == null || !header.startsWith("Bearer ")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+            } else {
+                UsernamePasswordAuthenticationToken authResult = getAuthenticationByToken(header);
+
+                // Token expired
+                if (authResult == null) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                }
+                SecurityContextHolder.getContext().setAuthentication(authResult);
             }
-
-            SecurityContextHolder.getContext().setAuthentication(authResult);
         }
-
         chain.doFilter(request, response);
     }
 
+    public String convertObjectToJson(Object object) throws JsonProcessingException {
+        if (object == null) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(object);
+    }
 
     private UsernamePasswordAuthenticationToken getAuthenticationByToken(String header) {
 
-        // Parse token trough signing key
-        Jws<Claims> claimsJws = Jwts.parser().setSigningKey("iFuZc|_6D{UBn(A".getBytes(StandardCharsets.UTF_8))
-                .parseClaimsJws(header.replace("Bearer ", ""));
+        try {
+            // Parse token trough signing key
+            Jws<Claims> claimsJws = Jwts.parser().setSigningKey("iFuZc|_6D{UBn(A".getBytes(StandardCharsets.UTF_8))
+                    .parseClaimsJws(header.replace("Bearer ", ""));
 
-        if(claimsJws == null) {
-            return null;
+            // Get username and user permissions from token
+            String email = claimsJws.getBody().get("email").toString();
+            String permissions = claimsJws.getBody().get("permissions").toString();
+
+            Set<SimpleGrantedAuthority> role = Collections.singleton(new SimpleGrantedAuthority(permissions));
+
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(email, null, role);
+
+            return usernamePasswordAuthenticationToken;
+        } catch (ExpiredJwtException exception) {
+            System.out.println("Token Expired!");
         }
-
-        // Get username and user permissions from token
-        String email = claimsJws.getBody().get("email").toString();
-        String permissions = claimsJws.getBody().get("permissions").toString();
-
-        //
-        Set<SimpleGrantedAuthority> role = Collections.singleton(new SimpleGrantedAuthority(permissions));
-
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(email, null, role);
-
-        return usernamePasswordAuthenticationToken;
+        return null;
     }
 }

@@ -39,7 +39,7 @@ public class WorkoutRestController {
     @GetMapping("/workouts/public")
     public ResponseEntity<List<Workout>> getPublicWorkouts() {
         List<Workout> workoutList = workoutService.getPublicWorkouts();
-
+        System.out.println("Workout List:" + workoutList);
         if(workoutList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -80,14 +80,14 @@ public class WorkoutRestController {
     public ResponseEntity<Workout> updateWorkout(@RequestHeader (name="Authorization") String header, @RequestBody Workout workout, @PathVariable int workoutId) {
         User user = userService.getUserFromToken(header);
 
-        Optional<Workout> optionalWorkout = Optional.ofNullable(workoutService.getWorkout(workoutId));
         if(workoutService.getWorkout(workoutId) == null) {
             return ResponseEntity.notFound().build();
         }
+
         workout.setId(workoutId);
         workoutService.saveWorkout(user, workout);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(workout);
     }
 
     @DeleteMapping("/workouts/{workoutId}")
@@ -100,6 +100,6 @@ public class WorkoutRestController {
         }
         workoutService.deleteWorkout(workoutId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Deleted");
     }
 }

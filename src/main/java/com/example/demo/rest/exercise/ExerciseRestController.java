@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -117,17 +118,24 @@ public class ExerciseRestController {
         return ResponseEntity.ok(exerciseService.getExercisesByWorkoutId(workoutId));
     }
 
-    @PutMapping("/exercises")
-    public Exercise updateExercise(@RequestHeader (name="Authorization") String header, @RequestBody ExerciseData exerciseData) {
-        User user = userService.getUserFromToken(header);
+    @PutMapping("/exercises/{exerciseId}")
+    public ResponseEntity<Exercise> updateExercise(@PathVariable int exerciseId, @RequestBody ExerciseData exerciseData) {
+        Exercise exercise = exerciseService.getExercise(exerciseId);
 
-        Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), false);
-        exerciseService.saveExercise(user, exercise, exerciseData.getCategory());
-        return exercise;
+        if(exercise == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        exercise.setName(exerciseData.getName());
+        exercise.setInfo(exerciseData.getInfo());
+
+        exerciseService.updateExercise(exercise, exerciseData.getCategory());
+
+        return ResponseEntity.ok(exercise);
     }
 
     @PutMapping("/exercises/{exerciseId}/{workoutId}")
-    public ResponseEntity<String> addExerciseToWorkout(@PathVariable int exerciseId,@PathVariable int workoutId, @RequestBody ExerciseData updatedExercise) {
+    public ResponseEntity<String> addExerciseToWorkout(@PathVariable int exerciseId,@PathVariable int workoutId) {
 
         Workout workout = workoutService.getWorkout(workoutId);
         Exercise exercise = exerciseService.getExercise(exerciseId);

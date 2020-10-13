@@ -30,13 +30,13 @@ public class Exercise {
     @Column(name = "exercise_isPublic")
     private boolean isPublic;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+    @ManyToOne(cascade = {CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "category")
     private ExerciseCategory exerciseCategory;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "exercises")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "exercises")
     private Set<Workout> workouts = new HashSet<>();
 
     @JsonIgnore
@@ -61,6 +61,16 @@ public class Exercise {
         this.name = name;
         this.info = info;
         this.isPublic = isPublic;
+    }
+
+    public Exercise(String name, String info, boolean isPublic, ExerciseCategory exerciseCategory, Set<Workout> workouts, User author, List<ExerciseLog> exerciseLogs) {
+        this.name = name;
+        this.info = info;
+        this.isPublic = isPublic;
+        this.exerciseCategory = exerciseCategory;
+        this.workouts = workouts;
+        this.author = author;
+        this.exerciseLogs = exerciseLogs;
     }
 
     public int getId() {
@@ -125,6 +135,20 @@ public class Exercise {
 
     public void setExerciseLogs(List<ExerciseLog> exerciseLogs) {
         this.exerciseLogs = exerciseLogs;
+    }
+
+    @Override
+    public String toString() {
+        return "Exercise{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", info='" + info + '\'' +
+                ", isPublic=" + isPublic +
+                ", exerciseCategory=" + exerciseCategory +
+                ", workouts=" + workouts +
+                ", author=" + author +
+                ", exerciseLogs=" + exerciseLogs +
+                '}';
     }
 
     @Override

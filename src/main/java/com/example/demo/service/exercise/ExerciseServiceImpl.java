@@ -17,8 +17,14 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
-    public List<Exercise> getExercises() {
-        return exerciseDAO.getExercises();
+    public List<Exercise> getExercises(User user) {
+        return exerciseDAO.getExercises(user);
+    }
+
+    @Override
+    @Transactional
+    public List<Exercise> getPublicExercises() {
+        return exerciseDAO.getPublicExercises();
     }
 
     @Override
@@ -47,8 +53,8 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
-    public void addExerciseToWorkout(Exercise exercise, Workout workout) {
-        exerciseDAO.addExerciseToWorkout(exercise, workout);
+    public void addExistingExerciseToWorkout(Exercise exercise, Workout workout) {
+        exerciseDAO.addExistingExerciseToWorkout(exercise, workout);
     }
 
     @Override

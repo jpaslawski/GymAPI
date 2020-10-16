@@ -33,7 +33,7 @@ public class WorkoutDAOImpl implements WorkoutDAO {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Workout> theQuery =
-                currentSession.createQuery("FROM Workout WHERE isPublic=true", Workout.class);
+                currentSession.createQuery("FROM Workout WHERE status=0", Workout.class);
         return theQuery.getResultList();
     }
 

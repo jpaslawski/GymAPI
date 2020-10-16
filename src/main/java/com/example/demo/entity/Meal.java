@@ -34,8 +34,8 @@ public class Meal {
     @Column(name = "meal_portion_weight")
     private float portionWeight;
 
-    @Column(name = "meal_isPublic")
-    private boolean isPublic;
+    @Column(name = "meal_status")
+    private Status status;
 
     @JsonIgnore
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
@@ -54,13 +54,14 @@ public class Meal {
     public Meal() {
     }
 
-    public Meal(String name, float calories, float protein, float carbs, float fat, float portionWeight) {
+    public Meal(String name, float calories, float protein, float carbs, float fat, float portionWeight, Status status) {
         this.name = name;
         this.calories = calories;
         this.protein = protein;
         this.carbs = carbs;
         this.fat = fat;
         this.portionWeight = portionWeight;
+        this.status = status;
     }
 
     public int getId() {
@@ -119,12 +120,12 @@ public class Meal {
         this.portionWeight = portionWeight;
     }
 
-    public boolean isPublic() {
-        return isPublic;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public User getUser() {

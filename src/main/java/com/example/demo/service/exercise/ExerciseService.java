@@ -9,7 +9,9 @@ public interface ExerciseService {
 
     /********************* Exercise methods *********************/
 
-    List<Exercise> getExercises();
+    List<Exercise> getExercises(User user);
+
+    List<Exercise> getPublicExercises();
 
     Set<Exercise> getExercisesByWorkoutId(int workoutId);
 
@@ -19,7 +21,7 @@ public interface ExerciseService {
 
     void updateExercise(Exercise exercise, String category);
 
-    void addExerciseToWorkout(Exercise exercise, Workout workout);
+    void addExistingExerciseToWorkout(Exercise exercise, Workout workout);
 
     void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);
 

@@ -27,46 +27,49 @@ public class Exercise {
     @Column(name = "exercise_info")
     private String info;
 
-    @Column(name = "exercise_isPublic")
-    private boolean isPublic;
+    @Column(name = "exercise_status")
+    private Status status;
 
     @ManyToOne(cascade = {CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "category")
+    @Fetch(FetchMode.SELECT)
     private ExerciseCategory exerciseCategory;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "exercises")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "exercises")
+    @Fetch(FetchMode.SUBSELECT)
     private Set<Workout> workouts = new HashSet<>();
 
     @JsonIgnore
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "author")
+    @Fetch(FetchMode.SELECT)
     private User author;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER,
+    @OneToMany(fetch = FetchType.LAZY,
             mappedBy = "referredExercise",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH})
-    @Fetch(value = FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
     private List<ExerciseLog> exerciseLogs;
 
     public Exercise() {
 
     }
 
-    public Exercise(String name, String info, boolean isPublic) {
+    public Exercise(String name, String info, Status status) {
         this.name = name;
         this.info = info;
-        this.isPublic = isPublic;
+        this.status = status;
     }
 
-    public Exercise(String name, String info, boolean isPublic, ExerciseCategory exerciseCategory, Set<Workout> workouts, User author, List<ExerciseLog> exerciseLogs) {
+    public Exercise(String name, String info, Status status, ExerciseCategory exerciseCategory, Set<Workout> workouts, User author, List<ExerciseLog> exerciseLogs) {
         this.name = name;
         this.info = info;
-        this.isPublic = isPublic;
+        this.status = status;
         this.exerciseCategory = exerciseCategory;
         this.workouts = workouts;
         this.author = author;
@@ -97,12 +100,12 @@ public class Exercise {
         this.info = info;
     }
 
-    public boolean isPublic() {
-        return isPublic;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public ExerciseCategory getExerciseCategory() {
@@ -143,7 +146,6 @@ public class Exercise {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", info='" + info + '\'' +
-                ", isPublic=" + isPublic +
                 ", exerciseCategory=" + exerciseCategory +
                 ", workouts=" + workouts +
                 ", author=" + author +

@@ -53,19 +53,23 @@ public class DietRestController {
     public ResponseEntity<Void> addMeal(@RequestHeader (name="Authorization") String header, @RequestBody Meal meal) throws URISyntaxException {
         User user = userService.getUserFromToken(header);
 
+        meal.setId(0);
+        meal.setStatus(Status.PRIVATE);
         dietService.saveMeal(meal, user);
         return ResponseEntity.created(new URI("/meals/" + meal.getId())).build();
     }
 
     @PutMapping("/meals/{mealId}")
-    public ResponseEntity<?> updateMeal(@RequestHeader (name="Authorization") String header, @PathVariable int mealId) {
+    public ResponseEntity<?> updateMeal(@RequestHeader (name="Authorization") String header, @RequestBody Meal meal, @PathVariable int mealId) {
         User user = userService.getUserFromToken(header);
         Meal tempMeal = dietService.getMeal(mealId);
 
         if (tempMeal == null) {
             return ResponseEntity.notFound().build();
         }
-        dietService.saveMeal(tempMeal, user);
+        meal.setId(tempMeal.getId());
+        meal.setStatus(tempMeal.getStatus());
+        dietService.saveMeal(meal, user);
 
         return ResponseEntity.noContent().build();
     }

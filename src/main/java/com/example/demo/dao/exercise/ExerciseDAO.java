@@ -7,7 +7,9 @@ import java.util.Set;
 
 public interface ExerciseDAO {
 
-    List<Exercise> getExercises();
+    List<Exercise> getExercises(User user);
+
+    List<Exercise> getPublicExercises();
 
     Set<Exercise> getExercisesByWorkoutId(int workoutId);
 
@@ -17,7 +19,7 @@ public interface ExerciseDAO {
 
     void updateExercise(Exercise exercise, String category);
 
-    void addExerciseToWorkout(Exercise exercise, Workout workout);
+    void addExistingExerciseToWorkout(Exercise exercise, Workout workout);
 
     void addNewExerciseToWorkout(User user, Workout workout, Exercise exercise, String category);
 

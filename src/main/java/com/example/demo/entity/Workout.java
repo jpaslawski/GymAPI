@@ -2,6 +2,8 @@ package com.example.demo.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -22,8 +24,8 @@ public class Workout {
     @Column(name = "workout_info")
     private String info;
 
-    @Column(name = "workout_isPublic")
-    private boolean isPublic;
+    @Column(name = "workout_status")
+    private Status status;
 
     @Column(name ="workout_exerciseAmount")
     private int exerciseAmount;
@@ -32,6 +34,7 @@ public class Workout {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "workout_author")
+    @Fetch(FetchMode.SELECT)
     private User author;
 
     @JsonIgnore
@@ -40,17 +43,18 @@ public class Workout {
     @JoinTable(name="workout_exercise",
             joinColumns = { @JoinColumn(name="workout_id")},
             inverseJoinColumns = { @JoinColumn(name ="exercise_id")})
+    @Fetch(FetchMode.SUBSELECT)
     private Set<Exercise> exercises = new HashSet<>();
 
     public Workout() {
 
     }
 
-    public Workout(String name, String info, User author, boolean isPublic, int exerciseAmount) {
+    public Workout(String name, String info, Status status, User author, int exerciseAmount) {
         this.name = name;
         this.info = info;
+        this.status = status;
         this.author = author;
-        this.isPublic = isPublic;
         this.exerciseAmount = exerciseAmount;
     }
 
@@ -78,20 +82,20 @@ public class Workout {
         this.info = info;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     public User getAuthor() {
         return author;
     }
 
     public void setAuthor(User author) {
         this.author = author;
-    }
-
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
     }
 
     public void setExercises(Set<Exercise> exercises) {

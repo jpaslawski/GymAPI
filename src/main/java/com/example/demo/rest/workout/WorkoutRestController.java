@@ -1,5 +1,6 @@
 package com.example.demo.rest.workout;
 
+import com.example.demo.entity.Status;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import com.example.demo.entity.request.WorkoutData;
@@ -39,7 +40,7 @@ public class WorkoutRestController {
     @GetMapping("/workouts/public")
     public ResponseEntity<List<Workout>> getPublicWorkouts() {
         List<Workout> workoutList = workoutService.getPublicWorkouts();
-        System.out.println("Workout List:" + workoutList);
+
         if(workoutList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -68,7 +69,7 @@ public class WorkoutRestController {
 
         User user = userService.getUserFromToken(header);
 
-        Workout workout = new Workout(workoutData.getName(), workoutData.getInfo(), null, false, 0);
+        Workout workout = new Workout(workoutData.getName(), workoutData.getInfo(), Status.PRIVATE, null,  0);
 
         workout.setId(0);
         workoutService.saveWorkout(user, workout);
@@ -79,12 +80,14 @@ public class WorkoutRestController {
     @PutMapping("/workouts/{workoutId}")
     public ResponseEntity<Workout> updateWorkout(@RequestHeader (name="Authorization") String header, @RequestBody Workout workout, @PathVariable int workoutId) {
         User user = userService.getUserFromToken(header);
+        Workout optionalWorkout = workoutService.getWorkout(workoutId);
 
-        if(workoutService.getWorkout(workoutId) == null) {
+        if(optionalWorkout == null) {
             return ResponseEntity.notFound().build();
         }
 
         workout.setId(workoutId);
+        workout.setStatus(optionalWorkout.getStatus());
         workoutService.saveWorkout(user, workout);
 
         return ResponseEntity.ok(workout);

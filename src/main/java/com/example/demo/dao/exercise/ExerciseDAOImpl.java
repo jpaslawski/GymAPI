@@ -19,12 +19,22 @@ public class ExerciseDAOImpl implements ExerciseDAO {
 
     /** Get a list of all exercises **/
     @Override
-    public List<Exercise> getExercises() {
+    public List<Exercise> getExercises(User user) {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Exercise> theQuery =
-                currentSession.createQuery("FROM Exercise", Exercise.class);
+                currentSession.createQuery("FROM Exercise WHERE author=:user", Exercise.class);
+        theQuery.setParameter("user", user);
 
+        return theQuery.getResultList();
+    }
+
+    @Override
+    public List<Exercise> getPublicExercises() {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<Exercise> theQuery =
+                currentSession.createQuery("FROM Exercise WHERE status=0", Exercise.class);
         return theQuery.getResultList();
     }
 
@@ -76,7 +86,7 @@ public class ExerciseDAOImpl implements ExerciseDAO {
 
     /** Add existing exercise to workout (user is already set) **/
     @Override
-    public void addExerciseToWorkout(Exercise exercise, Workout workout) {
+    public void addExistingExerciseToWorkout(Exercise exercise, Workout workout) {
         Session currentSession = sessionFactory.getCurrentSession();
 
         workout.addExercise(exercise);

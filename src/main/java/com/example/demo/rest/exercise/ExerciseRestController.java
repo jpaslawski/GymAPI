@@ -1,6 +1,7 @@
 package com.example.demo.rest.exercise;
 
 import com.example.demo.entity.Exercise;
+import com.example.demo.entity.Status;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Workout;
 import com.example.demo.entity.request.ExerciseData;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -31,9 +31,26 @@ public class ExerciseRestController {
     private WorkoutService workoutService;
 
     @GetMapping("/exercises")
-    public List<Exercise> getExercises() {
+    public ResponseEntity<List<Exercise>> getExercises(@RequestHeader (name="Authorization") String header) {
+        User user = userService.getUserFromToken(header);
+        List<Exercise> exerciseList = exerciseService.getExercises(user);
 
-        return exerciseService.getExercises();
+        if(exerciseList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(exerciseList);
+    }
+
+    @GetMapping("/exercises/public")
+    public ResponseEntity<List<Exercise>> getPublicExercises() {
+        List<Exercise> exerciseList = exerciseService.getPublicExercises();
+
+        if(exerciseList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(exerciseList);
     }
 
     @GetMapping(value = "/exercises", params = "workoutId", produces = "application/json")
@@ -89,7 +106,7 @@ public class ExerciseRestController {
 
         User user = userService.getUserFromToken(header);
 
-        Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), false);
+        Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), Status.PRIVATE);
         exercise.setId(0);
 
         exerciseService.saveExercise(user, exercise, exerciseData.getCategory());
@@ -108,7 +125,7 @@ public class ExerciseRestController {
 
         User user = userService.getUserFromToken(header);
 
-        Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), false);
+        Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), Status.PRIVATE);
         exercise.setId(0);
 
         Workout workout = workoutService.getWorkout(workoutId);
@@ -135,12 +152,12 @@ public class ExerciseRestController {
     }
 
     @PutMapping("/exercises/{exerciseId}/{workoutId}")
-    public ResponseEntity<String> addExerciseToWorkout(@PathVariable int exerciseId,@PathVariable int workoutId) {
+    public ResponseEntity<String> addExistingExerciseToWorkout(@PathVariable int exerciseId, @PathVariable int workoutId) {
 
         Workout workout = workoutService.getWorkout(workoutId);
         Exercise exercise = exerciseService.getExercise(exerciseId);
 
-        exerciseService.addExerciseToWorkout(exercise, workout);
+        exerciseService.addExistingExerciseToWorkout(exercise, workout);
 
         return ResponseEntity.ok("Exercise " + exerciseId + " added to workout " + workoutId);
     }

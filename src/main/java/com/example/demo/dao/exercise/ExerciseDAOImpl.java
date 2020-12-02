@@ -17,7 +17,7 @@ public class ExerciseDAOImpl implements ExerciseDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
-    /** Get a list of all exercises **/
+    /** Get a list of all exercises of the given user **/
     @Override
     public List<Exercise> getExercises(User user) {
         Session currentSession = sessionFactory.getCurrentSession();
@@ -29,12 +29,23 @@ public class ExerciseDAOImpl implements ExerciseDAO {
         return theQuery.getResultList();
     }
 
+    /** Get a list of all public exercises (shared) **/
     @Override
     public List<Exercise> getPublicExercises() {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Exercise> theQuery =
                 currentSession.createQuery("FROM Exercise WHERE status=0", Exercise.class);
+        return theQuery.getResultList();
+    }
+
+    /** Get a list of all pending exercises **/
+    @Override
+    public List<Exercise> getPendingExercises() {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<Exercise> theQuery =
+                currentSession.createQuery("FROM Exercise WHERE status=1", Exercise.class);
         return theQuery.getResultList();
     }
 
@@ -66,10 +77,9 @@ public class ExerciseDAOImpl implements ExerciseDAO {
 
     /** Save or update an exercise **/
     @Override
-    public void saveExercise(User user, Exercise exercise, String category) {
+    public void saveExercise(User user, Exercise exercise) {
         Session currentSession = sessionFactory.getCurrentSession();
 
-        exercise.setExerciseCategory(getCategoryByName(category));
         exercise.setAuthor(user);
         user.addExercise(exercise);
 

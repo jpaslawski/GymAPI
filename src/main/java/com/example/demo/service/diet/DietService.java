@@ -8,7 +8,11 @@ import java.util.List;
 
 public interface DietService {
 
-    List<Meal> getMeals();
+    List<Meal> getMeals(User user);
+
+    List<Meal> getPublicMeals();
+
+    List<Meal> getPendingMeals();
 
     Meal getMeal(int mealId);
 

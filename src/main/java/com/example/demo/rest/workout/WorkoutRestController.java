@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -40,6 +39,17 @@ public class WorkoutRestController {
     @GetMapping("/workouts/public")
     public ResponseEntity<List<Workout>> getPublicWorkouts() {
         List<Workout> workoutList = workoutService.getPublicWorkouts();
+
+        if(workoutList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(workoutList);
+    }
+
+    @GetMapping("/admin/workouts/pending")
+    public ResponseEntity<List<Workout>> getPendingWorkouts() {
+        List<Workout> workoutList = workoutService.getPendingWorkouts();
 
         if(workoutList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -91,6 +101,20 @@ public class WorkoutRestController {
         workoutService.saveWorkout(user, workout);
 
         return ResponseEntity.ok(workout);
+    }
+
+    @PutMapping("/workouts/{workoutId}/share")
+    public ResponseEntity<Workout> shareWorkout(@RequestHeader (name="Authorization") String header, @PathVariable int workoutId) {
+        User user = userService.getUserFromToken(header);
+        Workout optionalWorkout = workoutService.getWorkout(workoutId);
+        if(optionalWorkout == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        optionalWorkout.setStatus(Status.PENDING);
+        workoutService.saveWorkout(user, optionalWorkout);
+
+        return ResponseEntity.ok(optionalWorkout);
     }
 
     @DeleteMapping("/workouts/{workoutId}")

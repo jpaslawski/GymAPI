@@ -28,8 +28,31 @@ public class DietRestController {
     private UserService userService;
 
     @GetMapping("/meals")
-    public ResponseEntity<List<Meal>> getMeals() {
-        List<Meal> mealList = dietService.getMeals();
+    public ResponseEntity<List<Meal>> getMeals(@RequestHeader (name="Authorization") String header) {
+        User user = userService.getUserFromToken(header);
+        List<Meal> mealList = dietService.getMeals(user);
+
+        if(mealList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(mealList);
+    }
+
+    @GetMapping("/meals/public")
+    public ResponseEntity<List<Meal>> getPublicMeals() {
+        List<Meal> mealList = dietService.getPublicMeals();
+
+        if(mealList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(mealList);
+    }
+
+    @GetMapping("/admin/meals/pending")
+    public ResponseEntity<List<Meal>> getPendingMeals() {
+        List<Meal> mealList = dietService.getPendingMeals();
 
         if(mealList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -72,6 +95,20 @@ public class DietRestController {
         dietService.saveMeal(meal, user);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/meals/{mealId}/share")
+    public ResponseEntity<Meal> shareMeal(@RequestHeader (name="Authorization") String header, @PathVariable int mealId) {
+        User user = userService.getUserFromToken(header);
+        Meal optionalMeal = dietService.getMeal(mealId);
+        if(optionalMeal == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        optionalMeal.setStatus(Status.PENDING);
+        dietService.saveMeal(optionalMeal, user);
+
+        return ResponseEntity.ok(optionalMeal);
     }
 
     @DeleteMapping("/meals/{mealId}")

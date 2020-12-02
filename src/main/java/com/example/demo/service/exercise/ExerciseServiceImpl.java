@@ -29,6 +29,12 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
+    public List<Exercise> getPendingExercises() {
+        return exerciseDAO.getPendingExercises();
+    }
+
+    @Override
+    @Transactional
     public Set<Exercise> getExercisesByWorkoutId(int workoutId) {
         return exerciseDAO.getExercisesByWorkoutId(workoutId);
     }
@@ -41,8 +47,8 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
-    public void saveExercise(User user, Exercise exercise, String category) {
-        exerciseDAO.saveExercise(user, exercise, category);
+    public void saveExercise(User user, Exercise exercise) {
+        exerciseDAO.saveExercise(user, exercise);
     }
 
     @Override

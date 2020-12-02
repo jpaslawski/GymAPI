@@ -53,6 +53,17 @@ public class ExerciseRestController {
         return ResponseEntity.ok(exerciseList);
     }
 
+    @GetMapping("/admin/exercises/pending")
+    public ResponseEntity<List<Exercise>> getPendingExercises() {
+        List<Exercise> exerciseList = exerciseService.getPendingExercises();
+
+        if(exerciseList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(exerciseList);
+    }
+
     @GetMapping(value = "/exercises", params = "workoutId", produces = "application/json")
     public ResponseEntity<Set<Exercise>> getExercisesByWorkoutId(@RequestParam("workoutId") int workoutId) {
 
@@ -108,8 +119,9 @@ public class ExerciseRestController {
 
         Exercise exercise = new Exercise(exerciseData.getName(), exerciseData.getInfo(), Status.PRIVATE);
         exercise.setId(0);
+        exercise.setExerciseCategory(exerciseService.getCategoryByName(exerciseData.getCategory()));
 
-        exerciseService.saveExercise(user, exercise, exerciseData.getCategory());
+        exerciseService.saveExercise(user, exercise);
 
         return ResponseEntity.ok(exercise);
     }
@@ -160,6 +172,20 @@ public class ExerciseRestController {
         exerciseService.addExistingExerciseToWorkout(exercise, workout);
 
         return ResponseEntity.ok("Exercise " + exerciseId + " added to workout " + workoutId);
+    }
+
+    @PutMapping("/exercises/{exerciseId}/share")
+    public ResponseEntity<Exercise> shareExercise(@RequestHeader (name="Authorization") String header, @PathVariable int exerciseId) {
+        User user = userService.getUserFromToken(header);
+        Exercise optionalExercise = exerciseService.getExercise(exerciseId);
+        if(optionalExercise == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        optionalExercise.setStatus(Status.PENDING);
+        exerciseService.saveExercise(user, optionalExercise);
+
+        return ResponseEntity.ok(optionalExercise);
     }
 
     @DeleteMapping("/exercises/{exerciseId}")

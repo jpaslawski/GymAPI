@@ -29,6 +29,12 @@ public class WorkoutServiceImpl implements WorkoutService {
 
     @Override
     @Transactional
+    public List<Workout> getPendingWorkouts() {
+        return workoutDAO.getPendingWorkouts();
+    }
+
+    @Override
+    @Transactional
     public void saveWorkout(User user, Workout workout) {
         workoutDAO.saveWorkout(user, workout);
     }

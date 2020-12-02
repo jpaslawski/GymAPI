@@ -11,6 +11,8 @@ public interface WorkoutService {
 
     List<Workout> getPublicWorkouts();
 
+    List<Workout> getPendingWorkouts();
+
     void saveWorkout(User user, Workout workout);
 
     Workout getWorkout(int workoutId);

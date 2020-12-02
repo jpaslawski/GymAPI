@@ -28,12 +28,23 @@ public class WorkoutDAOImpl implements WorkoutDAO {
         return theQuery.getResultList();
     }
 
+    /** Get a list of all the public workouts (shared) **/
     @Override
     public List<Workout> getPublicWorkouts() {
         Session currentSession = sessionFactory.getCurrentSession();
 
         Query<Workout> theQuery =
                 currentSession.createQuery("FROM Workout WHERE status=0", Workout.class);
+        return theQuery.getResultList();
+    }
+
+    /** Get a list of all the workouts that have status pending (waiting for admin to accept/deny) **/
+    @Override
+    public List<Workout> getPendingWorkouts() {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<Workout> theQuery =
+                currentSession.createQuery("FROM Workout WHERE status=1", Workout.class);
         return theQuery.getResultList();
     }
 

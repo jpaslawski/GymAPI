@@ -18,8 +18,20 @@ public class DietServiceImpl implements DietService {
 
     @Override
     @Transactional
-    public List<Meal> getMeals() {
-        return dietDAO.getMeals();
+    public List<Meal> getMeals(User user) {
+        return dietDAO.getMeals(user);
+    }
+
+    @Override
+    @Transactional
+    public List<Meal> getPublicMeals() {
+        return dietDAO.getPublicMeals();
+    }
+
+    @Override
+    @Transactional
+    public List<Meal> getPendingMeals() {
+        return dietDAO.getPendingMeals();
     }
 
     @Override

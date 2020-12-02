@@ -11,11 +11,13 @@ public interface ExerciseDAO {
 
     List<Exercise> getPublicExercises();
 
+    List<Exercise> getPendingExercises();
+
     Set<Exercise> getExercisesByWorkoutId(int workoutId);
 
     Set<Exercise> getExercisesByCategory(String category);
 
-    void saveExercise(User user, Exercise exercise, String category);
+    void saveExercise(User user, Exercise exercise);
 
     void updateExercise(Exercise exercise, String category);
 

@@ -57,7 +57,16 @@ public class DietDAOImpl implements DietDAO {
 
     @Override
     public List<Meal> getAdminPendingMeals() {
-        return null;
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<Meal> theQuery =
+                currentSession.createQuery("FROM Meal WHERE status=1", Meal.class);
+        List<Meal> resultList = theQuery.getResultList();
+        if(resultList.isEmpty()) {
+            return null;
+        }
+
+        return resultList;
     }
 
     @Override

@@ -1,0 +1,2 @@
+INSERT INTO app_db.user_preferences (preference_id, preference_language, preference_layout, preference_user) VALUES (1, 'PL', 'TABLE', 8);
+INSERT INTO app_db.user_preferences (preference_id, preference_language, preference_layout, preference_user) VALUES (3, 'PL', 'TABLE', 20);

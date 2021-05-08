@@ -1,4 +1,3 @@
-FROM openjdk:8-jdk-alpine
-ADD target/spring-boot-gym-api.jar app.jar
-EXPOSE 8443
-ENTRYPOINT ["java","-jar","/app.jar"]
+From openjdk:8
+copy ./target/api-1.jar api-1.jar
+CMD ["java","-jar","api-1.jar"]

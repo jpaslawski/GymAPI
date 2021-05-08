@@ -138,10 +138,14 @@ public class UserRestController {
     public ResponseEntity<User> updateUser(@RequestHeader (name="Authorization") String header, @RequestBody UserUpdateData updatedUser) {
         User oldUserData = userService.getUserFromToken(header);
 
+        if (oldUserData == null) {
+            throw new ObjectNotFoundException("This user doesn't exist!");
+        }
+
         oldUserData.setUsername(updatedUser.getUsername());
         oldUserData.setDateOfBirth(updatedUser.getDateOfBirth());
         oldUserData.setHeight(updatedUser.getHeight());
-        if(!oldUserData.getWeight().equals(updatedUser.getWeight()) || userService.isWeightCheckedToday(oldUserData)) {
+        if(userService.isWeightCheckedToday(oldUserData)) {
             WeightLog weightLog = userService.getCurrentWeight(oldUserData);
             weightLog.setCurrentWeight(updatedUser.getWeight());
             userService.saveWeightLog(weightLog, oldUserData);

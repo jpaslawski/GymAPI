@@ -1,0 +1,10 @@
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (1, 'Chest', null, 'Klatka piersiowa');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (2, 'Triceps', null, 'Triceps');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (3, 'Biceps', null, 'Biceps');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (4, 'Abs', null, 'Mięśnie brzucha');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (5, 'Back', null, 'Plecy');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (6, 'Calves', null, 'Łydki');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (7, 'Forearms', null, 'Przedramię');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (8, 'Glutes', null, 'Pośladki');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (9, 'Legs', null, 'Nogi');
+INSERT INTO app_db.exercise_category (ec_id, ec_category, exercise_connected, ec_category_pl) VALUES (10, 'Shoulders', null, 'Barki');

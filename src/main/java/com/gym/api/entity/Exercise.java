@@ -55,11 +55,11 @@ public class Exercise {
     private User author;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY,
+    @OneToMany(fetch = FetchType.EAGER,
             mappedBy = "referredExercise",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE,
                     CascadeType.DETACH, CascadeType.REFRESH})
-    @Fetch(FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SELECT)
     private List<ExerciseLog> exerciseLogs;
 
     public Exercise() {
